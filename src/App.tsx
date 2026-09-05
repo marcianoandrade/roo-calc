@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { DefenseCalculator } from './components/DefenseCalculator';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { useLocale } from './i18n/LocaleContext';
 import { cookiesEnabled, removeItem } from './lib/cookies';
 import { LEGACY_COOKIE_KEYS } from './lib/persistence';
 
@@ -7,6 +9,7 @@ const ORIGINAL_URL = 'https://roo-calc.vercel.app/';
 const REPO_URL = 'https://github.com/marcianoandrade/roo-calc';
 
 export function App() {
+  const { t } = useLocale();
   const [cookiesOk] = useState(() => cookiesEnabled());
 
   // Cookies written by earlier versions of this page (removed screens) are cleaned up once.
@@ -16,28 +19,29 @@ export function App() {
 
   return (
     <main className="ro-desktop">
+      <LanguageSwitcher />
       {!cookiesOk && (
         <p className="ro-alert" role="alert">
-          Cookies are disabled in this browser, so inputs and saved snapshots will not persist between visits.
+          {t.cookieWarning}
         </p>
       )}
       <DefenseCalculator />
-      <footer className="ro-chat" aria-label="About this page">
+      <footer className="ro-chat">
         <p className="ro-chat-notice">
-          [Notice] This page was created with inspiration from the original{' '}
+          [Notice] {t.footer.notice}{' '}
           <a href={ORIGINAL_URL} target="_blank" rel="noreferrer">
-            Defense Calculator (roo-calc.vercel.app)
+            {t.footer.originalLink}
           </a>
           .
         </p>
         <p className="ro-chat-sys">
-          [System] Source code:{' '}
+          [System] {t.footer.source}{' '}
           <a href={REPO_URL} target="_blank" rel="noreferrer">
             github.com/marcianoandrade/roo-calc
           </a>
         </p>
         <p>
-          <small>Fan-made tool. Ragnarok Online and its artwork are © Gravity Co., Ltd. Not affiliated.</small>
+          <small>{t.footer.disclaimer}</small>
         </p>
       </footer>
     </main>

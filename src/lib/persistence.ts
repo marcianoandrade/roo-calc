@@ -9,6 +9,7 @@ import type { SnapshotCodec } from './history';
 export const COOKIE_KEYS = {
   defenseInputs: 'roo.def.inputs',
   defenseHistory: 'roo.def.history',
+  locale: 'roo.lang',
 } as const;
 
 /** Keys used by screens that no longer exist; removed on page load. */

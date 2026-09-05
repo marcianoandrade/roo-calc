@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { useLocale } from '../i18n/LocaleContext';
 
 interface SaveControlsProps {
   onSave: (label: string) => void;
@@ -11,6 +12,7 @@ interface SaveControlsProps {
 }
 
 export function SaveControls({ onSave, onCalculate, count, max, children }: SaveControlsProps) {
+  const { t } = useLocale();
   const [label, setLabel] = useState('');
   const [feedback, setFeedback] = useState('');
 
@@ -23,23 +25,22 @@ export function SaveControls({ onSave, onCalculate, count, max, children }: Save
   const save = () => {
     onSave(label);
     setLabel('');
-    setFeedback('Snapshot saved to cookies.');
+    setFeedback(t.actions.saved);
   };
 
   const calculate = () => {
     onCalculate?.();
-    setFeedback('Recalculated from the current inputs.');
+    setFeedback(t.actions.recalculated);
   };
 
-  const status =
-    count > 0 ? `${count} of ${max} snapshots stored in this browser's cookies.` : 'Snapshots are stored in this browser’s cookies.';
+  const status = count > 0 ? t.actions.stored(count, max) : t.actions.storedNone;
 
   return (
     <div className="ro-actions">
       <input
         className="ro-input"
-        aria-label="Snapshot label"
-        placeholder="Label (optional), e.g. after +10 armor"
+        aria-label={t.actions.labelAria}
+        placeholder={t.actions.labelPlaceholder}
         value={label}
         maxLength={40}
         onChange={(e) => setLabel(e.target.value)}
@@ -52,11 +53,11 @@ export function SaveControls({ onSave, onCalculate, count, max, children }: Save
       />
       {onCalculate && (
         <button type="button" className="ro-button" onClick={calculate}>
-          Calculate
+          {t.actions.calculate}
         </button>
       )}
       <button type="button" className="ro-button ro-button-primary" onClick={save}>
-        Save snapshot
+        {t.actions.save}
       </button>
       {children}
       <p className="ro-feedback" aria-live="polite">

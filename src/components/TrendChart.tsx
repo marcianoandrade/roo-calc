@@ -1,5 +1,7 @@
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { formatAxisDate, formatCompact, formatDateTime } from '../lib/format';
+import type { Locale } from '../i18n';
+import { useLocale } from '../i18n/LocaleContext';
+import { formatAxisDate, formatCompact, formatDateTime, formatFixed } from '../lib/format';
 
 export interface TrendSeries {
   key: string;
@@ -32,27 +34,27 @@ interface ChartTooltipProps {
   payload?: TooltipEntry[];
   unit: string;
   decimals: number;
+  locale: Locale;
 }
 
-function valueFormatter(decimals: number) {
-  return new Intl.NumberFormat('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-}
-
-function ChartTooltip({ active, payload, unit, decimals }: ChartTooltipProps) {
+function ChartTooltip({ active, payload, unit, decimals, locale }: ChartTooltipProps) {
   if (!active || !payload || payload.length === 0) return null;
   const point = payload[0].payload;
-  const fmt = valueFormatter(decimals);
   return (
     <div className="chart-tooltip">
       <p className="chart-tooltip-head">
-        {point ? formatDateTime(point.at) : ''}
+        {point ? formatDateTime(point.at, locale) : ''}
         {point?.label ? ` · ${point.label}` : ''}
       </p>
       {payload.map((entry) => (
         <div className="chart-tooltip-row" key={String(entry.dataKey)}>
           <span className="chart-tooltip-key" style={{ background: entry.color }} />
           <span>{String(entry.name ?? '')}</span>
-          <strong>{typeof entry.value === 'number' ? `${fmt.format(entry.value)}${unit}` : String(entry.value ?? '')}</strong>
+          <strong>
+            {typeof entry.value === 'number'
+              ? `${formatFixed(entry.value, decimals, locale)}${unit}`
+              : String(entry.value ?? '')}
+          </strong>
         </div>
       ))}
     </div>
@@ -68,11 +70,13 @@ interface TrendChartProps {
 }
 
 export function TrendChart({ title, points, series, unit = '', decimals = 0 }: TrendChartProps) {
+  const { t, locale } = useLocale();
+
   if (points.length === 0) {
     return (
       <div className="ro-chart">
         <h3>{title}</h3>
-        <p className="ro-chart-empty">Save a snapshot to start tracking.</p>
+        <p className="ro-chart-empty">{t.tracking.empty}</p>
       </div>
     );
   }
@@ -89,14 +93,14 @@ export function TrendChart({ title, points, series, unit = '', decimals = 0 }: T
             <XAxis
               dataKey="x"
               type="category"
-              tickFormatter={(index: number) => formatAxisDate(points[index]?.at ?? 0)}
+              tickFormatter={(index: number) => formatAxisDate(points[index]?.at ?? 0, locale)}
               tick={TICK}
               tickLine={false}
               axisLine={{ stroke: AXIS }}
               minTickGap={28}
             />
             <YAxis
-              tickFormatter={formatCompact}
+              tickFormatter={(value: number) => formatCompact(value, locale)}
               tick={TICK}
               tickLine={false}
               axisLine={false}
@@ -104,7 +108,7 @@ export function TrendChart({ title, points, series, unit = '', decimals = 0 }: T
               domain={['auto', 'auto']}
             />
             <Tooltip
-              content={<ChartTooltip unit={unit} decimals={decimals} />}
+              content={<ChartTooltip unit={unit} decimals={decimals} locale={locale} />}
               cursor={{ stroke: AXIS, strokeWidth: 1 }}
             />
             {series.length > 1 && (

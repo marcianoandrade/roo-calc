@@ -31,22 +31,24 @@ export const DEFAULT_DEFENSE_INPUTS: DefenseInputs = {
   mdmgReduction: '58.52',
 };
 
-/** Tier labels by total raw DEF (PDEF + MDEF), lowest first. */
-export const DEFENSE_TIERS: readonly { name: string; min: number }[] = [
+/** Tier labels by total raw DEF (PDEF + MDEF), lowest first. Names are stable ids; the UI translates them. */
+export const DEFENSE_TIERS = [
   { name: 'holding sandal mode', min: 0 },
   { name: 'light defense', min: 1000 },
   { name: 'mid defense', min: 2000 },
   { name: 'solid tank', min: 3000 },
   { name: 'strong shield', min: 4000 },
   { name: 'peak tank', min: 5000 },
-];
+] as const;
+
+export type TierName = (typeof DEFENSE_TIERS)[number]['name'];
 
 export interface TierProgress {
-  name: string;
+  name: TierName;
   /** Lower bound of the current tier. */
   floor: number;
   /** Next tier, or null when already at the top. */
-  next: { name: string; at: number } | null;
+  next: { name: TierName; at: number } | null;
   /** 0..1 progress from `floor` to the next tier (1 at the top tier). */
   progress: number;
 }
@@ -61,10 +63,20 @@ export interface DefenseResults {
   tier: TierProgress;
 }
 
-/** Accepts "23", "23%", "0.23" or a number. Values above 1 are treated as percent. */
+/**
+ * Accepts a decimal comma as well as a decimal point: "43,52" -> "43.52",
+ * "2.318,25" -> "2318.25". Text without a comma is returned unchanged.
+ */
+export function normalizeDecimal(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed.includes(',')) return trimmed;
+  return trimmed.replace(/\./g, '').replace(',', '.');
+}
+
+/** Accepts "23", "23%", "0.23", "23,5" or a number. Values above 1 are treated as percent. */
 export function parsePercent(value: string | number): number {
   if (typeof value === 'number') return value > 1 ? value / 100 : value;
-  const cleaned = value.trim().replace(/%/g, '');
+  const cleaned = normalizeDecimal(value.replace(/%/g, ''));
   if (cleaned === '') return 0;
   const n = Number(cleaned);
   if (Number.isNaN(n)) return 0;
@@ -72,7 +84,7 @@ export function parsePercent(value: string | number): number {
 }
 
 export function toNumber(value: string): number {
-  const n = Number(value);
+  const n = Number(normalizeDecimal(value));
   return Number.isFinite(n) ? n : 0;
 }
 
@@ -88,7 +100,7 @@ export function defenseTier(totalRawDefense: number): string {
 
 /** One tier with its inclusive range of total raw DEF (`max` is null for the top tier). */
 export interface TierRange {
-  name: string;
+  name: TierName;
   min: number;
   max: number | null;
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocale } from '../i18n/LocaleContext';
 import { formatDateTime } from '../lib/format';
 import type { Snapshot } from '../lib/history';
 
@@ -17,6 +18,7 @@ interface HistoryTableProps<T> {
 }
 
 export function HistoryTable<T>({ entries, columns, onRemove, onClear, onLoad }: HistoryTableProps<T>) {
+  const { t, locale } = useLocale();
   const [confirming, setConfirming] = useState(false);
 
   // Newest first, but keep the original index so remove/load hit the right entry.
@@ -25,7 +27,7 @@ export function HistoryTable<T>({ entries, columns, onRemove, onClear, onLoad }:
   return (
     <>
       <div className="ro-table-head">
-        <p className="ro-help">Newest first. Load restores the inputs of that snapshot.</p>
+        <p className="ro-help">{t.history.help}</p>
         <div className="history-actions">
           {confirming ? (
             <>
@@ -37,15 +39,15 @@ export function HistoryTable<T>({ entries, columns, onRemove, onClear, onLoad }:
                   setConfirming(false);
                 }}
               >
-                Confirm clear
+                {t.history.confirmClear}
               </button>
               <button type="button" className="ro-button" onClick={() => setConfirming(false)}>
-                Cancel
+                {t.history.cancel}
               </button>
             </>
           ) : (
             <button type="button" className="ro-button ro-button-danger" onClick={() => setConfirming(true)}>
-              Clear all
+              {t.history.clearAll}
             </button>
           )}
         </div>
@@ -54,19 +56,19 @@ export function HistoryTable<T>({ entries, columns, onRemove, onClear, onLoad }:
         <table className="ro-table">
           <thead>
             <tr>
-              <th>When</th>
-              <th>Label</th>
+              <th>{t.history.when}</th>
+              <th>{t.history.label}</th>
               {columns.map((column) => (
                 <th key={column.key}>{column.label}</th>
               ))}
-              <th aria-label="Actions" />
+              <th aria-label={t.history.actions} />
             </tr>
           </thead>
           <tbody>
             {rows.map(({ entry, index }) => (
               <tr key={`${entry.at}-${index}`}>
-                <td data-label="When">{formatDateTime(entry.at)}</td>
-                <td data-label="Label">{entry.label || '—'}</td>
+                <td data-label={t.history.when}>{formatDateTime(entry.at, locale)}</td>
+                <td data-label={t.history.label}>{entry.label || t.history.noLabel}</td>
                 {columns.map((column) => (
                   <td key={column.key} className="num" data-label={column.label}>
                     {column.render(entry.data)}
@@ -75,11 +77,11 @@ export function HistoryTable<T>({ entries, columns, onRemove, onClear, onLoad }:
                 <td className="actions">
                   {onLoad && (
                     <button type="button" className="ro-button" onClick={() => onLoad(index)}>
-                      Load
+                      {t.history.load}
                     </button>
                   )}
                   <button type="button" className="ro-button ro-button-danger" onClick={() => onRemove(index)}>
-                    Delete
+                    {t.history.delete}
                   </button>
                 </td>
               </tr>

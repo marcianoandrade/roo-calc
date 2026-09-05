@@ -323,7 +323,7 @@ a {
 
 .ro-bar-row {
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 6px;
   margin: 5px 0;
@@ -798,4 +798,34 @@ a {
   .ro-table td.actions::before {
     content: '';
   }
+}
+
+/* ---------------- Language switcher ---------------- */
+
+.ro-lang {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: -4px;
+}
+
+.ro-lang-label {
+  margin-right: 2px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #f3f6f9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.ro-lang-button {
+  padding: 0 8px;
+}
+
+.ro-button-active,
+.ro-button-active:hover {
+  background: linear-gradient(#cfd9e3, #e8eef4);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.25);
+  font-weight: bold;
+  color: #0f2a4d;
 }

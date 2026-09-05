@@ -27,6 +27,9 @@ created with inspiration from the original
 - **Share** button: copies `Raw Pdef: {value} Raw Mdef: {value}` to your clipboard,
   ready to paste into the game chat.
 - **Cookies only**: no accounts, no backend, no tracking.
+- **Three languages**: English, Português (Brasil) and Español. The page picks the
+  browser language and remembers the one you choose. Numbers and dates follow the
+  language too, and decimal commas are accepted in the inputs (`43,52`).
 
 ## How to use
 
@@ -48,6 +51,7 @@ year. Clearing the site's cookies wipes everything.
 |--------|---------|
 | `roo.def.inputs` | The last values typed in the Status window |
 | `roo.def.history` | Saved snapshots (timestamp, label, inputs) |
+| `roo.lang` | Chosen language (`en`, `pt-BR` or `es`) |
 
 Implementation notes (`src/lib/cookies.ts`, `src/lib/codec.ts`):
 
@@ -73,7 +77,9 @@ npm run preview    # serve the production build
 ```
 
 Stack: React 19 · TypeScript · Vite 7 · Recharts 3 · Vitest 3 (jsdom).
-The UI is English; docs and commit messages are in Portuguese.
+UI strings live in `src/i18n/` (`en.ts` is the reference; `pt-BR.ts` and `es.ts`
+must provide the same keys, which the type checker and a test enforce). Docs and
+commit messages are in Portuguese.
 
 ### Project layout
 
@@ -114,6 +120,11 @@ preset (`npm run build`, output `dist/`). Any static host works.
 - Fan-made tool. Ragnarok Online, Ragnarok Origin and related artwork are
   © Gravity Co., Ltd. Not affiliated with or endorsed by Gravity.
 
+## License
+
+[MIT](LICENSE) © 2026 Marciano Andrade. The license covers the code in this
+repository; game names and artwork remain the property of their owners.
+
 ---
 
 ## Resumo em português
@@ -127,7 +138,10 @@ rótulo, mostra gráficos da evolução e classifica a defesa total em patamares
 Tudo fica nos **cookies do navegador** (prefixo `roo.`, validade de 1 ano, limite de
 80 snapshots). Não existe servidor nem conta.
 
+A interface está em inglês, português do Brasil e espanhol: o idioma do navegador é
+detectado e a escolha fica guardada no cookie `roo.lang`.
+
 Para rodar: `npm install` e `npm run dev` (porta 5173). Testes com `npm test`; build
 com `npm run build`. Feito com inspiração na
-[página original](https://roo-calc.vercel.app/). Ferramenta de fã; Ragnarok é
-© Gravity Co., Ltd.
+[página original](https://roo-calc.vercel.app/). Licença [MIT](LICENSE). Ferramenta
+de fã; Ragnarok é © Gravity Co., Ltd.

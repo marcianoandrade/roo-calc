@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n/LocaleContext';
 import { round2 } from '../lib/codec';
 import { computeDefense, DEFAULT_DEFENSE_INPUTS, type DefenseInputs } from '../lib/defense';
 import { formatNumber, formatPercent } from '../lib/format';
@@ -14,14 +15,8 @@ import { TrendChart, type TrendPoint } from './TrendChart';
 
 const SANDAL_IMAGE = 'https://emoji.fileformat.info/png/1fa74.png';
 
-const HISTORY_COLUMNS: HistoryColumn<DefenseInputs>[] = [
-  { key: 'rawPdef', label: 'Raw PDEF', render: (d) => formatNumber(computeDefense(d).rawPdef) },
-  { key: 'rawMdef', label: 'Raw MDEF', render: (d) => formatNumber(computeDefense(d).rawMdef) },
-  { key: 'total', label: 'Total', render: (d) => formatNumber(computeDefense(d).totalRawDefense) },
-  { key: 'tier', label: 'Tier', render: (d) => computeDefense(d).tier.name },
-];
-
 export function DefenseCalculator() {
+  const { t, locale } = useLocale();
   const [inputs, setInputs] = useCookieState(
     COOKIE_KEYS.defenseInputs,
     DEFAULT_DEFENSE_INPUTS,
@@ -32,6 +27,7 @@ export function DefenseCalculator() {
   // Results are derived on every render, so typing already recalculates live.
   const results = computeDefense(inputs);
   const { tier } = results;
+  const fmt = (value: number) => formatNumber(value, locale);
 
   const update = (key: keyof DefenseInputs) => (value: string) => setInputs((prev) => ({ ...prev, [key]: value }));
 
@@ -45,67 +41,76 @@ export function DefenseCalculator() {
     };
   });
 
+  const historyColumns: HistoryColumn<DefenseInputs>[] = [
+    { key: 'rawPdef', label: t.basic.rawPdef, render: (d) => fmt(computeDefense(d).rawPdef) },
+    { key: 'rawMdef', label: t.basic.rawMdef, render: (d) => fmt(computeDefense(d).rawMdef) },
+    { key: 'total', label: t.history.total, render: (d) => fmt(computeDefense(d).totalRawDefense) },
+    { key: 'tier', label: t.history.tier, render: (d) => t.tier.names[computeDefense(d).tier.name] },
+  ];
+
   return (
     <>
       <div className="ro-grid">
-        <RoWindow title="Status" className="ro-window-status">
+        <RoWindow title={t.windows.status} className="ro-window-status">
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="ro-status-grid">
               <div className="ro-status-col">
-                <p className="ro-section-title">Physical</p>
+                <p className="ro-section-title">{t.status.physical}</p>
                 <StatRow
                   id="equipment-pdef-value"
-                  label="Equipment PDEF"
-                  description="Your equipment-based physical defense shown in the stat panel."
+                  label={t.status.pdef}
+                  description={t.status.pdefHelp}
                   value={inputs.pdef}
                   onChange={update('pdef')}
                 />
                 <StatRow
-                  label="Equipment PDEF %"
-                  description="The Equipment PDEF % value from Special stats. You can enter 23 or 23%."
+                  id="equipment-pdef-percent"
+                  label={t.status.pdefPercent}
+                  description={t.status.pdefPercentHelp}
                   value={inputs.equipPdefPercent}
                   onChange={update('equipPdefPercent')}
-                  placeholder="23 or 23%"
+                  placeholder={t.status.pdefPercentPlaceholder}
                 />
                 <StatRow
-                  label="PDMG Reduction"
-                  description="Displayed physical damage reduction stat (reference only)."
+                  id="pdmg-reduction"
+                  label={t.status.pdmg}
+                  description={t.status.pdmgHelp}
                   value={inputs.pdmgReduction}
                   onChange={update('pdmgReduction')}
-                  placeholder="43.52 or 43.52%"
+                  placeholder={t.status.pdmgPlaceholder}
                 />
               </div>
               <div className="ro-status-col">
-                <p className="ro-section-title">Magic</p>
+                <p className="ro-section-title">{t.status.magic}</p>
                 <StatRow
                   id="equipment-mdef-value"
-                  label="Equipment MDEF"
-                  description="Your equipment-based magic defense shown in the stat panel."
+                  label={t.status.mdef}
+                  description={t.status.mdefHelp}
                   value={inputs.mdef}
                   onChange={update('mdef')}
                 />
                 <StatRow
-                  label="Equipment MDEF %"
-                  description="The Equipment MDEF % value from Special stats. You can enter 16 or 16%."
+                  id="equipment-mdef-percent"
+                  label={t.status.mdefPercent}
+                  description={t.status.mdefPercentHelp}
                   value={inputs.equipMdefPercent}
                   onChange={update('equipMdefPercent')}
-                  placeholder="16 or 16%"
+                  placeholder={t.status.mdefPercentPlaceholder}
                 />
                 <StatRow
-                  label="MDMG Reduction"
-                  description="Displayed magic damage reduction stat (reference only)."
+                  id="mdmg-reduction"
+                  label={t.status.mdmg}
+                  description={t.status.mdmgHelp}
                   value={inputs.mdmgReduction}
                   onChange={update('mdmgReduction')}
-                  placeholder="58.52 or 58.52%"
+                  placeholder={t.status.mdmgPlaceholder}
                 />
               </div>
             </div>
             <div className="ro-method">
-              <p className="ro-section-title">How it is calculated</p>
+              <p className="ro-section-title">{t.status.howTitle}</p>
               <p className="ro-help">
-                Raw defense uses the visible client formula: <strong>equipment DEF / (1 + equipment DEF%)</strong>.
-                Values update as you type; the Calculate button simply runs the same math again. Reduction values
-                are shown as a mitigation reference only.
+                {t.status.howText} <strong>{t.status.howFormula}</strong>. {t.status.howTail}
               </p>
             </div>
             <SaveControls
@@ -115,66 +120,66 @@ export function DefenseCalculator() {
               max={history.max}
             >
               <button className="ro-button" type="button" onClick={() => setInputs(DEFAULT_DEFENSE_INPUTS)}>
-                Reset
+                {t.status.reset}
               </button>
             </SaveControls>
           </form>
         </RoWindow>
 
-        <RoWindow title="Basic Info" className="ro-window-basic">
+        <RoWindow title={t.windows.basicInfo} className="ro-window-basic">
           <div className="ro-basic-name">
-            <strong>Defense Calculator</strong>
-            <span className="ro-pill">{tier.name}</span>
+            <strong>{t.basic.name}</strong>
+            <span className="ro-pill">{t.tier.names[tier.name]}</span>
           </div>
           {tier.name === 'holding sandal mode' && (
             <div className="ro-sandal">
-              <img src={SANDAL_IMAGE} alt="sandal emoji" width="20" height="20" />
+              <img src={SANDAL_IMAGE} alt={t.basic.sandalAlt} width="20" height="20" />
             </div>
           )}
           <div className="ro-stat-list">
             <div className="ro-stat ro-stat-big">
-              <span>Raw PDEF</span>
-              <strong>{formatNumber(results.rawPdef)}</strong>
+              <span>{t.basic.rawPdef}</span>
+              <strong>{fmt(results.rawPdef)}</strong>
             </div>
             <div className="ro-stat ro-stat-big">
-              <span>Raw MDEF</span>
-              <strong>{formatNumber(results.rawMdef)}</strong>
+              <span>{t.basic.rawMdef}</span>
+              <strong>{fmt(results.rawMdef)}</strong>
             </div>
             <div className="ro-stat">
-              <span>Total raw DEF</span>
-              <strong>{formatNumber(results.totalRawDefense)}</strong>
+              <span>{t.basic.total}</span>
+              <strong>{fmt(results.totalRawDefense)}</strong>
             </div>
           </div>
           <ShareButton text={formatShareText(results.rawPdef, results.rawMdef)} />
           <TierPanel tier={tier} total={results.totalRawDefense} />
           <div className="ro-stat-list ro-stat-list-inline">
             <div className="ro-stat">
-              <span>PDMG Reduction</span>
-              <strong>{formatPercent(results.pdmgReduction)}</strong>
+              <span>{t.basic.pdmg}</span>
+              <strong>{formatPercent(results.pdmgReduction, 2, locale)}</strong>
             </div>
             <div className="ro-stat">
-              <span>MDMG Reduction</span>
-              <strong>{formatPercent(results.mdmgReduction)}</strong>
+              <span>{t.basic.mdmg}</span>
+              <strong>{formatPercent(results.mdmgReduction, 2, locale)}</strong>
             </div>
           </div>
         </RoWindow>
       </div>
 
-      <RoWindow title="Progress tracking" aside={`${history.entries.length} snapshots`}>
+      <RoWindow title={t.windows.tracking} aside={t.tracking.count(history.entries.length)}>
         <p className="ro-help" style={{ marginBottom: 8 }}>
-          Every saved snapshot becomes a point. Hover a point for the exact values.
+          {t.tracking.help}
         </p>
         <div className="ro-chart-grid">
-          <TrendChart title="Raw PDEF" points={points} series={[{ key: 'rawPdef', name: 'Raw PDEF' }]} />
-          <TrendChart title="Raw MDEF" points={points} series={[{ key: 'rawMdef', name: 'Raw MDEF' }]} />
+          <TrendChart title={t.tracking.rawPdef} points={points} series={[{ key: 'rawPdef', name: t.tracking.rawPdef }]} />
+          <TrendChart title={t.tracking.rawMdef} points={points} series={[{ key: 'rawMdef', name: t.tracking.rawMdef }]} />
         </div>
       </RoWindow>
 
       {history.entries.length > 0 && (
-        <RoWindow title="Saved snapshots" aside={`${history.entries.length} / ${history.max}`}>
+        <RoWindow title={t.windows.snapshots} aside={`${history.entries.length} / ${history.max}`}>
           <HistoryTable
             entries={history.entries}
-            columns={HISTORY_COLUMNS}
+            columns={historyColumns}
             onRemove={history.remove}
             onClear={history.clear}
             onLoad={(index) => setInputs(history.entries[index].data)}

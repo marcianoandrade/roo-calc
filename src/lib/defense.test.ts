@@ -3,6 +3,7 @@ import {
   computeDefense,
   DEFAULT_DEFENSE_INPUTS,
   defenseTier,
+  normalizeDecimal,
   parsePercent,
   rawDefense,
   tierLadder,
@@ -37,6 +38,21 @@ describe('toNumber', () => {
     expect(toNumber('')).toBe(0);
     expect(toNumber('x')).toBe(0);
     expect(toNumber('12.5')).toBe(12.5);
+  });
+
+  it('accepts a decimal comma', () => {
+    expect(toNumber('12,5')).toBe(12.5);
+    expect(toNumber('2.318,25')).toBe(2318.25);
+    expect(parsePercent('43,52%')).toBeCloseTo(0.4352);
+  });
+});
+
+describe('normalizeDecimal', () => {
+  it('turns a decimal comma into a point and drops thousands dots', () => {
+    expect(normalizeDecimal('43,52')).toBe('43.52');
+    expect(normalizeDecimal('2.318,25')).toBe('2318.25');
+    expect(normalizeDecimal(' 2318.25 ')).toBe('2318.25');
+    expect(normalizeDecimal('abc')).toBe('abc');
   });
 });
 

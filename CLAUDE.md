@@ -44,7 +44,12 @@ Leia o `README.md` para a visão geral e o formato dos cookies.
   Chave de cookie descontinuada vai para `LEGACY_COOKIE_KEYS` (é apagada ao abrir).
 - **Orçamento de cookies:** máx. 8 chunks × 3000 chars por chave e 80 snapshots
   (`MAX_HISTORY`). Não aumente sem considerar o tamanho do header HTTP.
-- UI em inglês (como o site original); documentação e commits em português.
+- UI em três idiomas (en, pt-BR, es) via `src/i18n/`: `en.ts` é a referência; `pt-BR.ts`
+  e `es.ts` precisam ter as mesmas chaves (tipo `Messages` + teste). Texto novo na UI
+  entra sempre nos três arquivos; nada de string solta em componente. Idioma detectado
+  pelo navegador e guardado em `roo.lang`. O texto do Share ("Raw Pdef: ...") não é
+  traduzido, é o formato pedido para o chat do jogo. Documentação e commits em português.
+- Licença MIT (`LICENSE`, `package.json`).
 - Toda função nova em `src/lib/` precisa de teste em `*.test.ts` ao lado.
 - Gráficos: cores das séries fixas em `SERIES_COLORS` (`TrendChart.tsx`), validadas para
   daltonismo no fundo claro `#fbfcfd`. Um eixo Y só; sem eixo duplo.
