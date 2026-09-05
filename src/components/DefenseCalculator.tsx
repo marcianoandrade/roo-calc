@@ -3,13 +3,13 @@ import { computeDefense, DEFAULT_DEFENSE_INPUTS, type DefenseInputs } from '../l
 import { formatNumber, formatPercent } from '../lib/format';
 import { useCookieHistory, useCookieState } from '../lib/history';
 import { COOKIE_KEYS, decodeDefenseInputs, defenseSnapshotCodec, encodeDefenseInputs } from '../lib/persistence';
+import { formatShareText } from '../lib/share';
 import { Meter, StatRow } from './Field';
 import { HistoryTable, type HistoryColumn } from './HistoryTable';
 import { RoWindow } from './RoWindow';
 import { SaveControls } from './SaveControls';
 import { ShareButton } from './ShareButton';
 import { TrendChart, type TrendPoint } from './TrendChart';
-import { formatShareText } from '../lib/share';
 
 const SANDAL_IMAGE = 'https://emoji.fileformat.info/png/1fa74.png';
 
@@ -28,6 +28,7 @@ export function DefenseCalculator() {
     decodeDefenseInputs,
   );
   const history = useCookieHistory(COOKIE_KEYS.defenseHistory, defenseSnapshotCodec);
+  // Results are derived on every render, so typing already recalculates live.
   const results = computeDefense(inputs);
   const { tier } = results;
 
@@ -50,55 +51,7 @@ export function DefenseCalculator() {
   return (
     <>
       <div className="ro-grid">
-        <RoWindow title="Basic Info">
-          <div className="ro-basic-name">
-            <strong>Defense Calculator</strong>
-            <span className="ro-pill">{tier.name}</span>
-          </div>
-          {tier.name === 'holding sandal mode' && (
-            <div className="ro-sandal">
-              <img src={SANDAL_IMAGE} alt="sandal emoji" width="20" height="20" />
-            </div>
-          )}
-          <div className="ro-stat-grid ro-stat-grid-big">
-            <div className="ro-stat">
-              <span>Raw PDEF</span>
-              <strong>{formatNumber(results.rawPdef)}</strong>
-            </div>
-            <div className="ro-stat">
-              <span>Raw MDEF</span>
-              <strong>{formatNumber(results.rawMdef)}</strong>
-            </div>
-          </div>
-          <div className="ro-stat">
-            <span>Total raw DEF</span>
-            <strong>{formatNumber(results.totalRawDefense)}</strong>
-          </div>
-          <ShareButton text={formatShareText(results.rawPdef, results.rawMdef)} />
-          <Meter label="Tier" progress={tier.progress} text={tierText} />
-          <p className="ro-help">
-            {tier.next
-              ? `Next tier "${tier.next.name}" at ${formatNumber(tier.next.at)} total raw DEF.`
-              : 'Top tier reached.'}
-          </p>
-          <div className="ro-stat-grid">
-            <div className="ro-stat">
-              <span>PDMG Reduction</span>
-              <strong>{formatPercent(results.pdmgReduction)}</strong>
-            </div>
-            <div className="ro-stat">
-              <span>MDMG Reduction</span>
-              <strong>{formatPercent(results.mdmgReduction)}</strong>
-            </div>
-          </div>
-          <p className="ro-section-title ro-push-bottom">How it is calculated</p>
-          <p className="ro-help">
-            Raw defense uses the visible client formula: <strong>equipment DEF / (1 + equipment DEF%)</strong>.
-            Reduction values are shown as a mitigation reference only.
-          </p>
-        </RoWindow>
-
-        <RoWindow title="Status">
+        <RoWindow title="Status" className="ro-window-status">
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="ro-status-grid">
               <div className="ro-status-col">
@@ -150,7 +103,16 @@ export function DefenseCalculator() {
                 />
               </div>
             </div>
+            <div className="ro-method">
+              <p className="ro-section-title">How it is calculated</p>
+              <p className="ro-help">
+                Raw defense uses the visible client formula: <strong>equipment DEF / (1 + equipment DEF%)</strong>.
+                Values update as you type; the Calculate button simply runs the same math again. Reduction values
+                are shown as a mitigation reference only.
+              </p>
+            </div>
             <SaveControls
+              onCalculate={() => setInputs((prev) => ({ ...prev }))}
               onSave={(label) => history.add(inputs, label)}
               count={history.entries.length}
               max={history.max}
@@ -160,6 +122,51 @@ export function DefenseCalculator() {
               </button>
             </SaveControls>
           </form>
+        </RoWindow>
+
+        <RoWindow title="Basic Info" className="ro-window-basic">
+          <div className="ro-basic-name">
+            <strong>Defense Calculator</strong>
+            <span className="ro-pill">{tier.name}</span>
+          </div>
+          {tier.name === 'holding sandal mode' && (
+            <div className="ro-sandal">
+              <img src={SANDAL_IMAGE} alt="sandal emoji" width="20" height="20" />
+            </div>
+          )}
+          <div className="ro-stat-list">
+            <div className="ro-stat ro-stat-big">
+              <span>Raw PDEF</span>
+              <strong>{formatNumber(results.rawPdef)}</strong>
+            </div>
+            <div className="ro-stat ro-stat-big">
+              <span>Raw MDEF</span>
+              <strong>{formatNumber(results.rawMdef)}</strong>
+            </div>
+            <div className="ro-stat">
+              <span>Total raw DEF</span>
+              <strong>{formatNumber(results.totalRawDefense)}</strong>
+            </div>
+          </div>
+          <ShareButton text={formatShareText(results.rawPdef, results.rawMdef)} />
+          <div>
+            <Meter label="Tier" progress={tier.progress} text={tierText} />
+            <p className="ro-help">
+              {tier.next
+                ? `Next tier "${tier.next.name}" at ${formatNumber(tier.next.at)} total raw DEF.`
+                : 'Top tier reached.'}
+            </p>
+          </div>
+          <div className="ro-stat-list">
+            <div className="ro-stat">
+              <span>PDMG Reduction</span>
+              <strong>{formatPercent(results.pdmgReduction)}</strong>
+            </div>
+            <div className="ro-stat">
+              <span>MDMG Reduction</span>
+              <strong>{formatPercent(results.mdmgReduction)}</strong>
+            </div>
+          </div>
         </RoWindow>
       </div>
 

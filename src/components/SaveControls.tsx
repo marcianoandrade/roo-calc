@@ -2,13 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react';
 
 interface SaveControlsProps {
   onSave: (label: string) => void;
+  /** Re-runs the calculation on demand (the values already update live while typing). */
+  onCalculate?: () => void;
   count: number;
   max: number;
-  /** Extra buttons rendered next to the save button (e.g. Reset). */
+  /** Extra buttons rendered after the save button (e.g. Reset). */
   children?: ReactNode;
 }
 
-export function SaveControls({ onSave, count, max, children }: SaveControlsProps) {
+export function SaveControls({ onSave, onCalculate, count, max, children }: SaveControlsProps) {
   const [label, setLabel] = useState('');
   const [feedback, setFeedback] = useState('');
 
@@ -22,6 +24,11 @@ export function SaveControls({ onSave, count, max, children }: SaveControlsProps
     onSave(label);
     setLabel('');
     setFeedback('Snapshot saved to cookies.');
+  };
+
+  const calculate = () => {
+    onCalculate?.();
+    setFeedback('Recalculated from the current inputs.');
   };
 
   const status =
@@ -43,6 +50,11 @@ export function SaveControls({ onSave, count, max, children }: SaveControlsProps
           }
         }}
       />
+      {onCalculate && (
+        <button type="button" className="ro-button" onClick={calculate}>
+          Calculate
+        </button>
+      )}
       <button type="button" className="ro-button ro-button-primary" onClick={save}>
         Save snapshot
       </button>

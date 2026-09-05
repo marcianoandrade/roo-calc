@@ -63,7 +63,7 @@ a {
 /* Side-by-side windows share the row height, like docked client windows. */
 .ro-grid {
   display: grid;
-  grid-template-columns: 360px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: 14px;
   align-items: stretch;
 }
@@ -79,19 +79,22 @@ a {
   flex-direction: column;
 }
 
-.ro-grid > .ro-window > .ro-body > form {
+/* Any spare height is spread between the blocks instead of piling up at the bottom. */
+.ro-window-status form {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.ro-grid > .ro-window > .ro-body > form > .ro-status-grid {
-  flex: 1;
+.ro-window-basic > .ro-body {
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.ro-push-bottom {
-  margin-top: auto !important;
-  padding-top: 10px;
+.ro-method .ro-section-title {
+  margin-top: 4px;
 }
 
 .ro-col {
@@ -168,8 +171,7 @@ a {
 }
 
 .ro-section-title + .ro-section-title,
-.ro-help + .ro-section-title,
-.ro-stat-grid + .ro-section-title {
+.ro-help + .ro-section-title {
   margin-top: 10px;
 }
 
@@ -296,11 +298,8 @@ a {
   color: #0f2a4d;
 }
 
-.ro-stat-grid {
+.ro-stat-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 2px 12px;
-  margin: 6px 0;
 }
 
 .ro-stat {
@@ -372,12 +371,16 @@ a {
   border: 1px solid var(--ro-border-soft);
 }
 
-.ro-stat-grid-big .ro-stat strong {
-  font-size: 14px;
+.ro-stat-big {
+  padding: 5px 0;
+}
+
+.ro-stat-big strong {
+  font-size: 18px;
 }
 
 .ro-share {
-  margin: 8px 0 6px;
+  margin: 0;
 }
 
 .ro-share-row {
@@ -458,10 +461,10 @@ a {
 
 .ro-actions {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   gap: 6px;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .ro-actions .ro-feedback {
