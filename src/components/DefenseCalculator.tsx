@@ -3,10 +3,10 @@ import { computeDefense, DEFAULT_DEFENSE_INPUTS, type DefenseInputs } from '../l
 import { formatNumber, formatPercent } from '../lib/format';
 import { useCookieHistory, useCookieState } from '../lib/history';
 import { COOKIE_KEYS, decodeDefenseInputs, defenseSnapshotCodec, encodeDefenseInputs } from '../lib/persistence';
-import { Field, MetricCard } from './Field';
+import { Meter, StatRow } from './Field';
 import { HistoryTable, type HistoryColumn } from './HistoryTable';
+import { RoWindow } from './RoWindow';
 import { SaveControls } from './SaveControls';
-import { StatsGuide } from './StatsGuide';
 import { TrendChart, type TrendPoint } from './TrendChart';
 
 const SANDAL_IMAGE = 'https://emoji.fileformat.info/png/1fa74.png';
@@ -14,8 +14,8 @@ const SANDAL_IMAGE = 'https://emoji.fileformat.info/png/1fa74.png';
 const HISTORY_COLUMNS: HistoryColumn<DefenseInputs>[] = [
   { key: 'rawPdef', label: 'Raw PDEF', render: (d) => formatNumber(computeDefense(d).rawPdef) },
   { key: 'rawMdef', label: 'Raw MDEF', render: (d) => formatNumber(computeDefense(d).rawMdef) },
-  { key: 'pdefAfter', label: 'PDEF after Ignore', render: (d) => formatNumber(computeDefense(d).pdefAfterIgnore) },
-  { key: 'mdefAfter', label: 'MDEF after Ignore', render: (d) => formatNumber(computeDefense(d).mdefAfterIgnore) },
+  { key: 'total', label: 'Total', render: (d) => formatNumber(computeDefense(d).totalRawDefense) },
+  { key: 'tier', label: 'Tier', render: (d) => computeDefense(d).tier.name },
 ];
 
 export function DefenseCalculator() {
@@ -27,6 +27,7 @@ export function DefenseCalculator() {
   );
   const history = useCookieHistory(COOKIE_KEYS.defenseHistory, defenseSnapshotCodec);
   const results = computeDefense(inputs);
+  const { tier } = results;
 
   const update = (key: keyof DefenseInputs) => (value: string) => setInputs((prev) => ({ ...prev, [key]: value }));
 
@@ -36,201 +37,150 @@ export function DefenseCalculator() {
       at: entry.at,
       label: entry.label,
       rawPdef: round2(r.rawPdef),
-      pdefAfter: round2(r.pdefAfterIgnore),
       rawMdef: round2(r.rawMdef),
-      mdefAfter: round2(r.mdefAfterIgnore),
     };
   });
 
+  const tierText = tier.next
+    ? `${formatNumber(results.totalRawDefense)} / ${formatNumber(tier.next.at)}`
+    : `${formatNumber(results.totalRawDefense)} · MAX`;
+
   return (
-    <section className="calculator-card">
-      <header className="hero">
-        <div className="hero-topline">
-          <span className="eyebrow">Defense Calculator</span>
-          <span className="hero-badge">Kraken-style dashboard</span>
-        </div>
-        <h1>Raw DEF and effective DEF vs ignore</h1>
-        <p className="hero-copy">
-          Exact raw defense math from the client, with a clean read on what survives after ignore.
-        </p>
-        <div className="hero-meta">
-          <span>Live recalculation</span>
-          <span>Exact raw DEF</span>
-          <span>Estimate mode for mitigation</span>
-          <span>Saved in cookies</span>
-        </div>
-        <div className="methodology-card">
-          <p className="subtext">
-            Raw defense is calculated from the visible client formula:
-            <strong> equipment DEF / (1 + equipment DEF%)</strong>.
-          </p>
-          <p className="subtext">
-            Effective defense vs ignore shows what remains after the attacker&apos;s ignore stat is subtracted from
-            your raw defense.
-          </p>
-          <p className="subtext">
-            Mitigation values are practical estimates based on visible client-side formulas, not a guaranteed full
-            server reconstruction.
-          </p>
-        </div>
-        <div className="metric-strip">
-          <MetricCard label="Raw PDEF" value={formatNumber(results.rawPdef)} tone="purple" />
-          <MetricCard label="Raw MDEF" value={formatNumber(results.rawMdef)} tone="blue" />
-          <MetricCard label="PDEF after Ignore" value={formatNumber(results.pdefAfterIgnore)} tone="gold" />
-          <MetricCard label="MDEF after Ignore" value={formatNumber(results.mdefAfterIgnore)} tone="gold" />
-        </div>
-      </header>
-
-      <div className="layout">
-        <form className="input-grid" onSubmit={(e) => e.preventDefault()}>
-          <div className="input-grid-full">
-            <StatsGuide />
+    <>
+      <div className="ro-grid">
+        <RoWindow title="Basic Info">
+          <div className="ro-basic-name">
+            <strong>Defense Calculator</strong>
+            <span className="ro-pill">{tier.name}</span>
           </div>
-          <Field
-            id="equipment-pdef-value"
-            label="Equipment PDEF"
-            description="Your equipment-based physical defense shown in the stat panel."
-            value={inputs.pdef}
-            onChange={update('pdef')}
-          />
-          <Field
-            id="equipment-mdef-value"
-            label="Equipment MDEF"
-            description="Your equipment-based magic defense shown in the stat panel."
-            value={inputs.mdef}
-            onChange={update('mdef')}
-          />
-          <Field
-            label="Equipment PDEF %"
-            description="The Equipment PDEF % value from Special stats. You can enter 23 or 23%."
-            value={inputs.equipPdefPercent}
-            onChange={update('equipPdefPercent')}
-            placeholder="23 or 23%"
-          />
-          <Field
-            label="Equipment MDEF %"
-            description="The Equipment MDEF % value from Special stats. You can enter 16 or 16%."
-            value={inputs.equipMdefPercent}
-            onChange={update('equipMdefPercent')}
-            placeholder="16 or 16%"
-          />
-          <Field
-            label="Ignore PDEF"
-            description="Attacker stat used to bypass part of your physical defense."
-            value={inputs.ignorePdef}
-            onChange={update('ignorePdef')}
-          />
-          <Field
-            label="Ignore MDEF"
-            description="Attacker stat used to bypass part of your magic defense."
-            value={inputs.ignoreMdef}
-            onChange={update('ignoreMdef')}
-          />
-          <Field
-            label="PDMG Reduction"
-            description="Displayed physical damage reduction stat. Treated here as a mitigation reference, not a full final-damage formula."
-            value={inputs.pdmgReduction}
-            onChange={update('pdmgReduction')}
-            placeholder="43.52 or 43.52%"
-          />
-          <Field
-            label="MDMG Reduction"
-            description="Displayed magic damage reduction stat. Treated here as a mitigation reference, not a full final-damage formula."
-            value={inputs.mdmgReduction}
-            onChange={update('mdmgReduction')}
-            placeholder="58.52 or 58.52%"
-          />
-          <SaveControls
-            className="save-row"
-            onSave={(label) => history.add(inputs, label)}
-            count={history.entries.length}
-            max={history.max}
-          >
-            <button className="reset-button" type="button" onClick={() => setInputs(DEFAULT_DEFENSE_INPUTS)}>
-              Reset
-            </button>
-          </SaveControls>
-        </form>
-
-        <aside className="results-panel">
-          <div className="result-group result-group-main">
-            <div className="result-head">
-              <h2>Result Snapshot</h2>
-              <span className="result-tag">{results.tier}</span>
+          {tier.name === 'holding sandal mode' && (
+            <div className="ro-sandal">
+              <img src={SANDAL_IMAGE} alt="sandal emoji" width="20" height="20" />
             </div>
-            {results.tier === 'holding sandal mode' ? (
-              <div className="commentary-image-wrap">
-                <img src={SANDAL_IMAGE} alt="sandal emoji" width="28" height="28" />
+          )}
+          <div className="ro-stat-grid ro-stat-grid-big">
+            <div className="ro-stat">
+              <span>Raw PDEF</span>
+              <strong>{formatNumber(results.rawPdef)}</strong>
+            </div>
+            <div className="ro-stat">
+              <span>Raw MDEF</span>
+              <strong>{formatNumber(results.rawMdef)}</strong>
+            </div>
+          </div>
+          <div className="ro-stat">
+            <span>Total raw DEF</span>
+            <strong>{formatNumber(results.totalRawDefense)}</strong>
+          </div>
+          <Meter label="Tier" progress={tier.progress} text={tierText} />
+          <p className="ro-help">
+            {tier.next
+              ? `Next tier "${tier.next.name}" at ${formatNumber(tier.next.at)} total raw DEF.`
+              : 'Top tier reached.'}
+          </p>
+          <div className="ro-stat-grid">
+            <div className="ro-stat">
+              <span>PDMG Reduction</span>
+              <strong>{formatPercent(results.pdmgReduction)}</strong>
+            </div>
+            <div className="ro-stat">
+              <span>MDMG Reduction</span>
+              <strong>{formatPercent(results.mdmgReduction)}</strong>
+            </div>
+          </div>
+          <p className="ro-section-title">How it is calculated</p>
+          <p className="ro-help">
+            Raw defense uses the visible client formula: <strong>equipment DEF / (1 + equipment DEF%)</strong>.
+            Reduction values are shown as a mitigation reference only.
+          </p>
+        </RoWindow>
+
+        <RoWindow title="Status">
+          <form onSubmit={(e) => e.preventDefault()}>
+            <div className="ro-status-grid">
+              <div className="ro-status-col">
+                <p className="ro-section-title">Physical</p>
+                <StatRow
+                  id="equipment-pdef-value"
+                  label="Equipment PDEF"
+                  description="Your equipment-based physical defense shown in the stat panel."
+                  value={inputs.pdef}
+                  onChange={update('pdef')}
+                />
+                <StatRow
+                  label="Equipment PDEF %"
+                  description="The Equipment PDEF % value from Special stats. You can enter 23 or 23%."
+                  value={inputs.equipPdefPercent}
+                  onChange={update('equipPdefPercent')}
+                  placeholder="23 or 23%"
+                />
+                <StatRow
+                  label="PDMG Reduction"
+                  description="Displayed physical damage reduction stat (reference only)."
+                  value={inputs.pdmgReduction}
+                  onChange={update('pdmgReduction')}
+                  placeholder="43.52 or 43.52%"
+                />
               </div>
-            ) : (
-              <p className="commentary-text">{results.tier}</p>
-            )}
-          </div>
-          <div className="result-group">
-            <h2>Raw DEF</h2>
-            <p>
-              <strong>PDEF:</strong> {formatNumber(results.rawPdef)}
-            </p>
-            <p>
-              <strong>MDEF:</strong> {formatNumber(results.rawMdef)}
-            </p>
-          </div>
-          <div className="result-group">
-            <h2>Effective DEF vs Ignore</h2>
-            <p>
-              <strong>PDEF after Ignore:</strong> {formatNumber(results.pdefAfterIgnore)}
-            </p>
-            <p>
-              <strong>MDEF after Ignore:</strong> {formatNumber(results.mdefAfterIgnore)}
-            </p>
-          </div>
-          <div className="result-group">
-            <h2>Reduction Reference</h2>
-            <p>
-              <strong>PDMG Reduction:</strong> {formatPercent(results.pdmgReduction)}
-            </p>
-            <p>
-              <strong>MDMG Reduction:</strong> {formatPercent(results.mdmgReduction)}
-            </p>
-          </div>
-        </aside>
+              <div className="ro-status-col">
+                <p className="ro-section-title">Magic</p>
+                <StatRow
+                  id="equipment-mdef-value"
+                  label="Equipment MDEF"
+                  description="Your equipment-based magic defense shown in the stat panel."
+                  value={inputs.mdef}
+                  onChange={update('mdef')}
+                />
+                <StatRow
+                  label="Equipment MDEF %"
+                  description="The Equipment MDEF % value from Special stats. You can enter 16 or 16%."
+                  value={inputs.equipMdefPercent}
+                  onChange={update('equipMdefPercent')}
+                  placeholder="16 or 16%"
+                />
+                <StatRow
+                  label="MDMG Reduction"
+                  description="Displayed magic damage reduction stat (reference only)."
+                  value={inputs.mdmgReduction}
+                  onChange={update('mdmgReduction')}
+                  placeholder="58.52 or 58.52%"
+                />
+              </div>
+            </div>
+            <SaveControls
+              onSave={(label) => history.add(inputs, label)}
+              count={history.entries.length}
+              max={history.max}
+            >
+              <button className="ro-button" type="button" onClick={() => setInputs(DEFAULT_DEFENSE_INPUTS)}>
+                Reset
+              </button>
+            </SaveControls>
+          </form>
+        </RoWindow>
       </div>
 
-      <section className="tracking-card" aria-label="Progress tracking">
-        <div className="tracking-head">
-          <div>
-            <h2>Progress tracking</h2>
-            <p>Every saved snapshot becomes a point. Hover a point for the exact values; load one to restore its inputs.</p>
-          </div>
-          <span className="tracking-count">{history.entries.length} snapshots</span>
+      <RoWindow title="Progress tracking" aside={`${history.entries.length} snapshots`}>
+        <p className="ro-help" style={{ marginBottom: 8 }}>
+          Every saved snapshot becomes a point. Hover a point for the exact values.
+        </p>
+        <div className="ro-chart-grid">
+          <TrendChart title="Raw PDEF" points={points} series={[{ key: 'rawPdef', name: 'Raw PDEF' }]} />
+          <TrendChart title="Raw MDEF" points={points} series={[{ key: 'rawMdef', name: 'Raw MDEF' }]} />
         </div>
-        <div className="chart-grid">
-          <TrendChart
-            title="Physical defense"
-            points={points}
-            series={[
-              { key: 'rawPdef', name: 'Raw PDEF' },
-              { key: 'pdefAfter', name: 'PDEF after Ignore' },
-            ]}
+      </RoWindow>
+
+      {history.entries.length > 0 && (
+        <RoWindow title="Saved snapshots" aside={`${history.entries.length} / ${history.max}`}>
+          <HistoryTable
+            entries={history.entries}
+            columns={HISTORY_COLUMNS}
+            onRemove={history.remove}
+            onClear={history.clear}
+            onLoad={(index) => setInputs(history.entries[index].data)}
           />
-          <TrendChart
-            title="Magic defense"
-            points={points}
-            series={[
-              { key: 'rawMdef', name: 'Raw MDEF' },
-              { key: 'mdefAfter', name: 'MDEF after Ignore' },
-            ]}
-          />
-        </div>
-        <HistoryTable
-          entries={history.entries}
-          columns={HISTORY_COLUMNS}
-          max={history.max}
-          onRemove={history.remove}
-          onClear={history.clear}
-          onLoad={(index) => setInputs(history.entries[index].data)}
-        />
-      </section>
-    </section>
+        </RoWindow>
+      )}
+    </>
   );
 }

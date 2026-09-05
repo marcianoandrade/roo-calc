@@ -4,12 +4,11 @@ interface SaveControlsProps {
   onSave: (label: string) => void;
   count: number;
   max: number;
-  className: string;
   /** Extra buttons rendered next to the save button (e.g. Reset). */
   children?: ReactNode;
 }
 
-export function SaveControls({ onSave, count, max, className, children }: SaveControlsProps) {
+export function SaveControls({ onSave, count, max, children }: SaveControlsProps) {
   const [label, setLabel] = useState('');
   const [feedback, setFeedback] = useState('');
 
@@ -29,9 +28,9 @@ export function SaveControls({ onSave, count, max, className, children }: SaveCo
     count > 0 ? `${count} of ${max} snapshots stored in this browser's cookies.` : 'Snapshots are stored in this browser’s cookies.';
 
   return (
-    <div className={className}>
+    <div className="ro-actions">
       <input
-        className="label-input"
+        className="ro-input"
         aria-label="Snapshot label"
         placeholder="Label (optional), e.g. after +10 armor"
         value={label}
@@ -44,11 +43,11 @@ export function SaveControls({ onSave, count, max, className, children }: SaveCo
           }
         }}
       />
-      <button type="button" className="save-button" onClick={save}>
+      <button type="button" className="ro-button ro-button-primary" onClick={save}>
         Save snapshot
       </button>
       {children}
-      <p className="save-feedback" aria-live="polite">
+      <p className="ro-feedback" aria-live="polite">
         {feedback || status}
       </p>
     </div>

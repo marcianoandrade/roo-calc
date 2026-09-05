@@ -12,12 +12,12 @@ export interface TrendPoint {
   [key: string]: number | string;
 }
 
-/** Fixed categorical order (validated for CVD on the #0c1223 surface). Never reassigned by rank. */
-export const SERIES_COLORS = ['#3987e5', '#d95926', '#199e70'] as const;
-const SURFACE = '#0c1223';
-const GRID = 'rgba(148,163,184,0.14)';
-const AXIS = 'rgba(148,163,184,0.3)';
-const TICK = { fill: '#94a3b8', fontSize: 12 };
+/** Fixed categorical order (validated for CVD on the light #fbfcfd surface). Never reassigned by rank. */
+export const SERIES_COLORS = ['#2a78d6', '#eb6834', '#1baf7a'] as const;
+const SURFACE = '#fbfcfd';
+const GRID = '#dfe6ee';
+const AXIS = '#9aa9b8';
+const TICK = { fill: '#5a6978', fontSize: 10 };
 
 interface TooltipEntry {
   dataKey?: string | number;
@@ -70,9 +70,9 @@ interface TrendChartProps {
 export function TrendChart({ title, points, series, unit = '', decimals = 0 }: TrendChartProps) {
   if (points.length === 0) {
     return (
-      <div className="chart-card">
+      <div className="ro-chart">
         <h3>{title}</h3>
-        <p className="chart-empty">Save a snapshot to start tracking.</p>
+        <p className="ro-chart-empty">Save a snapshot to start tracking.</p>
       </div>
     );
   }
@@ -80,11 +80,11 @@ export function TrendChart({ title, points, series, unit = '', decimals = 0 }: T
   const data = points.map((point, index) => ({ ...point, x: index }));
 
   return (
-    <div className="chart-card">
+    <div className="ro-chart">
       <h3>{title}</h3>
       <div className="chart-plot">
-        <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={data} margin={{ top: 12, right: 16, bottom: 0, left: 0 }}>
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={data} margin={{ top: 10, right: 12, bottom: 0, left: 0 }}>
             <CartesianGrid stroke={GRID} vertical={false} />
             <XAxis
               dataKey="x"
@@ -100,14 +100,16 @@ export function TrendChart({ title, points, series, unit = '', decimals = 0 }: T
               tick={TICK}
               tickLine={false}
               axisLine={false}
-              width={52}
+              width={46}
               domain={['auto', 'auto']}
             />
             <Tooltip
               content={<ChartTooltip unit={unit} decimals={decimals} />}
               cursor={{ stroke: AXIS, strokeWidth: 1 }}
             />
-            <Legend iconType="plainline" wrapperStyle={{ fontSize: 12, color: '#cbd5e1', paddingTop: 8 }} />
+            {series.length > 1 && (
+              <Legend iconType="plainline" wrapperStyle={{ fontSize: 10, color: '#3a4b5e', paddingTop: 6 }} />
+            )}
             {series.map((s, i) => (
               <Line
                 key={s.key}

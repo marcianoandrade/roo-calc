@@ -8,8 +8,6 @@ export interface DefenseInputs {
   mdef: string;
   equipPdefPercent: string;
   equipMdefPercent: string;
-  ignorePdef: string;
-  ignoreMdef: string;
   pdmgReduction: string;
   mdmgReduction: string;
 }
@@ -20,8 +18,6 @@ export const DEFENSE_FIELDS: readonly (keyof DefenseInputs)[] = [
   'mdef',
   'equipPdefPercent',
   'equipMdefPercent',
-  'ignorePdef',
-  'ignoreMdef',
   'pdmgReduction',
   'mdmgReduction',
 ];
@@ -31,22 +27,38 @@ export const DEFAULT_DEFENSE_INPUTS: DefenseInputs = {
   mdef: '824',
   equipPdefPercent: '23',
   equipMdefPercent: '16',
-  ignorePdef: '315',
-  ignoreMdef: '76',
   pdmgReduction: '43.52',
   mdmgReduction: '58.52',
 };
 
+/** Tier labels by total raw DEF (PDEF + MDEF), lowest first. */
+export const DEFENSE_TIERS: readonly { name: string; min: number }[] = [
+  { name: 'holding sandal mode', min: 0 },
+  { name: 'light defense', min: 1000 },
+  { name: 'mid defense', min: 2000 },
+  { name: 'solid tank', min: 3000 },
+  { name: 'strong shield', min: 4000 },
+  { name: 'peak tank', min: 5000 },
+];
+
+export interface TierProgress {
+  name: string;
+  /** Lower bound of the current tier. */
+  floor: number;
+  /** Next tier, or null when already at the top. */
+  next: { name: string; at: number } | null;
+  /** 0..1 progress from `floor` to the next tier (1 at the top tier). */
+  progress: number;
+}
+
 export interface DefenseResults {
   rawPdef: number;
   rawMdef: number;
-  pdefAfterIgnore: number;
-  mdefAfterIgnore: number;
   /** Fractions (0.4352 for "43.52%"). */
   pdmgReduction: number;
   mdmgReduction: number;
   totalRawDefense: number;
-  tier: string;
+  tier: TierProgress;
 }
 
 /** Accepts "23", "23%", "0.23" or a number. Values above 1 are treated as percent. */
@@ -70,17 +82,21 @@ export function rawDefense(equipmentDefense: number, equipmentPercent: number): 
   return divisor === 0 ? 0 : equipmentDefense / divisor;
 }
 
-export function effectiveDefense(raw: number, ignore: number): number {
-  return Math.max(raw - ignore, 0);
+export function defenseTier(totalRawDefense: number): string {
+  return tierProgress(totalRawDefense).name;
 }
 
-export function defenseTier(totalRawDefense: number): string {
-  if (totalRawDefense < 1000) return 'holding sandal mode';
-  if (totalRawDefense < 2000) return 'light defense';
-  if (totalRawDefense < 3000) return 'mid defense';
-  if (totalRawDefense < 4000) return 'solid tank';
-  if (totalRawDefense < 5000) return 'strong shield';
-  return 'peak tank';
+export function tierProgress(totalRawDefense: number): TierProgress {
+  let index = 0;
+  for (let i = 0; i < DEFENSE_TIERS.length; i++) {
+    if (totalRawDefense >= DEFENSE_TIERS[i].min) index = i;
+  }
+  const current = DEFENSE_TIERS[index];
+  const upper = DEFENSE_TIERS[index + 1];
+  if (!upper) return { name: current.name, floor: current.min, next: null, progress: 1 };
+  const span = upper.min - current.min;
+  const progress = Math.min(Math.max((totalRawDefense - current.min) / span, 0), 1);
+  return { name: current.name, floor: current.min, next: { name: upper.name, at: upper.min }, progress };
 }
 
 export function computeDefense(inputs: DefenseInputs): DefenseResults {
@@ -90,11 +106,9 @@ export function computeDefense(inputs: DefenseInputs): DefenseResults {
   return {
     rawPdef,
     rawMdef,
-    pdefAfterIgnore: effectiveDefense(rawPdef, toNumber(inputs.ignorePdef)),
-    mdefAfterIgnore: effectiveDefense(rawMdef, toNumber(inputs.ignoreMdef)),
     pdmgReduction: parsePercent(inputs.pdmgReduction),
     mdmgReduction: parsePercent(inputs.mdmgReduction),
     totalRawDefense,
-    tier: defenseTier(totalRawDefense),
+    tier: tierProgress(totalRawDefense),
   };
 }

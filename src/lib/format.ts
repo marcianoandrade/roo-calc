@@ -18,8 +18,8 @@ export function formatAxisDate(ms: number): string {
   return axisFormat.format(new Date(ms));
 }
 
-/** Compact axis tick: 2500 -> "2.5k". */
+/** Axis tick: full number below 10,000 ("2,328"), abbreviated above ("12.5k"). */
 export function formatCompact(value: number): string {
-  if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k`;
+  if (Math.abs(value) >= 10000) return `${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k`;
   return numberFormat.format(value);
 }
