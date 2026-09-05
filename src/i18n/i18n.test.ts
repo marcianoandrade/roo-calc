@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decodeLocale, detectLocale, intlTag, LOCALES, MESSAGES, type Messages } from './index';
+import { decodeLocale, DEFAULT_LOCALE, intlTag, LOCALES, MESSAGES, type Messages } from './index';
 
 function flatten(value: unknown, prefix = ''): string[] {
   if (typeof value !== 'object' || value === null) return [prefix];
@@ -11,18 +11,10 @@ function leaves(value: unknown): unknown[] {
   return Object.values(value).flatMap(leaves);
 }
 
-describe('detectLocale', () => {
-  it('maps browser tags to supported locales', () => {
-    expect(detectLocale('pt-BR')).toBe('pt-BR');
-    expect(detectLocale('pt')).toBe('pt-BR');
-    expect(detectLocale('es-MX')).toBe('es');
-    expect(detectLocale('ES')).toBe('es');
-    expect(detectLocale('en-US')).toBe('en');
-  });
-
-  it('falls back to English', () => {
-    expect(detectLocale('fr-FR')).toBe('en');
-    expect(detectLocale(undefined)).toBe('en');
+describe('default locale', () => {
+  it('is English regardless of the browser language', () => {
+    expect(DEFAULT_LOCALE).toBe('en');
+    expect(LOCALES[0].id).toBe(DEFAULT_LOCALE);
   });
 });
 

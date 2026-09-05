@@ -7,6 +7,7 @@ export type Locale = 'en' | 'pt-BR' | 'es';
 /** Shape of a dictionary; `en` is the reference. */
 export type Messages = typeof en;
 
+/** The page always starts in English; the flags switch it and the choice is kept in a cookie. */
 export const DEFAULT_LOCALE: Locale = 'en';
 
 export const LOCALES: readonly { id: Locale; label: string; intl: string }[] = [
@@ -27,14 +28,6 @@ export function decodeLocale(raw: string): Locale | null {
 
 export function encodeLocale(locale: Locale): string {
   return locale;
-}
-
-/** Maps a BCP 47 tag from the browser ("pt-BR", "es-MX", "en") to a supported locale. */
-export function detectLocale(language: string | undefined): Locale {
-  const lang = (language ?? '').toLowerCase();
-  if (lang.startsWith('pt')) return 'pt-BR';
-  if (lang.startsWith('es')) return 'es';
-  return DEFAULT_LOCALE;
 }
 
 /** Tag handed to Intl formatters. */

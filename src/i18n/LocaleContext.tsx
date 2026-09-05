@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { useCookieState } from '../lib/history';
 import { COOKIE_KEYS } from '../lib/persistence';
-import { decodeLocale, detectLocale, encodeLocale, MESSAGES, type Locale, type Messages } from './index';
+import { DEFAULT_LOCALE, decodeLocale, encodeLocale, MESSAGES, type Locale, type Messages } from './index';
 
 interface LocaleValue {
   locale: Locale;
@@ -13,12 +13,8 @@ interface LocaleValue {
 const LocaleContext = createContext<LocaleValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useCookieState<Locale>(
-    COOKIE_KEYS.locale,
-    detectLocale(typeof navigator === 'undefined' ? undefined : navigator.language),
-    encodeLocale,
-    decodeLocale,
-  );
+  // English unless the visitor already picked a language (kept in the roo.lang cookie).
+  const [locale, setLocale] = useCookieState<Locale>(COOKIE_KEYS.locale, DEFAULT_LOCALE, encodeLocale, decodeLocale);
 
   useEffect(() => {
     document.documentElement.lang = locale;

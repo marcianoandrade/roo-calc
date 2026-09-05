@@ -46,8 +46,9 @@ Leia o `README.md` para a visão geral e o formato dos cookies.
   (`MAX_HISTORY`). Não aumente sem considerar o tamanho do header HTTP.
 - UI em três idiomas (en, pt-BR, es) via `src/i18n/`: `en.ts` é a referência; `pt-BR.ts`
   e `es.ts` precisam ter as mesmas chaves (tipo `Messages` + teste). Texto novo na UI
-  entra sempre nos três arquivos; nada de string solta em componente. Idioma detectado
-  pelo navegador e guardado em `roo.lang`. O texto do Share ("Raw Pdef: ...") não é
+  entra sempre nos três arquivos; nada de string solta em componente. Inglês é o padrão
+  (sem detecção pelo navegador, decisão do Marciano em 05/09/2026); a escolha nas
+  bandeirinhas fica em `roo.lang`. O texto do Share ("Raw Pdef: ...") não é
   traduzido, é o formato pedido para o chat do jogo. Documentação e commits em português.
 - Licença MIT (`LICENSE`, `package.json`).
 - Hospedado na Vercel (deploy automático a cada push na `main`). `@vercel/analytics`

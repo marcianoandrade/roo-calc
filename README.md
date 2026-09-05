@@ -29,9 +29,10 @@ created with inspiration from the original
 - **Cookies only**: no accounts, no backend. Your stats never leave the browser. The
   hosted site counts page views with [Vercel Web Analytics](https://vercel.com/docs/analytics)
   (cookieless, no personal data, and it never sees what you type).
-- **Three languages** (flag buttons at the top-right): English, Português (Brasil) and Español. The page picks the
-  browser language and remembers the one you choose. Numbers and dates follow the
-  language too, and decimal commas are accepted in the inputs (`43,52`).
+- **Three languages** (flag buttons at the top-right): English, Português (Brasil)
+  and Español. The page starts in English and remembers the one you choose. Numbers
+  and dates follow the language too, and decimal commas are accepted in the inputs
+  (`43,52`).
 
 ## How to use
 
@@ -146,8 +147,8 @@ Tudo fica nos **cookies do navegador** (prefixo `roo.`, validade de 1 ano, limit
 80 snapshots). Não existe servidor nem conta. O site hospedado conta visitas com a
 Vercel Web Analytics (sem cookies e sem dados pessoais).
 
-A interface está em inglês, português do Brasil e espanhol: o idioma do navegador é
-detectado e a escolha fica guardada no cookie `roo.lang`.
+A interface está em inglês, português do Brasil e espanhol: começa em inglês, e a
+escolha feita nas bandeirinhas fica guardada no cookie `roo.lang`.
 
 Para rodar: `npm install` e `npm run dev` (porta 5173). Testes com `npm test`; build
 com `npm run build`. Feito com inspiração na
