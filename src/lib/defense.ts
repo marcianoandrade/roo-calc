@@ -86,6 +86,21 @@ export function defenseTier(totalRawDefense: number): string {
   return tierProgress(totalRawDefense).name;
 }
 
+/** One tier with its inclusive range of total raw DEF (`max` is null for the top tier). */
+export interface TierRange {
+  name: string;
+  min: number;
+  max: number | null;
+}
+
+/** Every tier, lowest first, with the range of total raw DEF it covers. */
+export function tierLadder(): TierRange[] {
+  return DEFENSE_TIERS.map((tier, i) => {
+    const upper = DEFENSE_TIERS[i + 1];
+    return { name: tier.name, min: tier.min, max: upper ? upper.min - 1 : null };
+  });
+}
+
 export function tierProgress(totalRawDefense: number): TierProgress {
   let index = 0;
   for (let i = 0; i < DEFENSE_TIERS.length; i++) {

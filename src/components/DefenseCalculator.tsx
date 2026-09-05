@@ -4,11 +4,12 @@ import { formatNumber, formatPercent } from '../lib/format';
 import { useCookieHistory, useCookieState } from '../lib/history';
 import { COOKIE_KEYS, decodeDefenseInputs, defenseSnapshotCodec, encodeDefenseInputs } from '../lib/persistence';
 import { formatShareText } from '../lib/share';
-import { Meter, StatRow } from './Field';
+import { StatRow } from './Field';
 import { HistoryTable, type HistoryColumn } from './HistoryTable';
 import { RoWindow } from './RoWindow';
 import { SaveControls } from './SaveControls';
 import { ShareButton } from './ShareButton';
+import { TierPanel } from './TierPanel';
 import { TrendChart, type TrendPoint } from './TrendChart';
 
 const SANDAL_IMAGE = 'https://emoji.fileformat.info/png/1fa74.png';
@@ -43,10 +44,6 @@ export function DefenseCalculator() {
       rawMdef: round2(r.rawMdef),
     };
   });
-
-  const tierText = tier.next
-    ? `${formatNumber(results.totalRawDefense)} / ${formatNumber(tier.next.at)}`
-    : `${formatNumber(results.totalRawDefense)} · MAX`;
 
   return (
     <>
@@ -149,15 +146,8 @@ export function DefenseCalculator() {
             </div>
           </div>
           <ShareButton text={formatShareText(results.rawPdef, results.rawMdef)} />
-          <div>
-            <Meter label="Tier" progress={tier.progress} text={tierText} />
-            <p className="ro-help">
-              {tier.next
-                ? `Next tier "${tier.next.name}" at ${formatNumber(tier.next.at)} total raw DEF.`
-                : 'Top tier reached.'}
-            </p>
-          </div>
-          <div className="ro-stat-list">
+          <TierPanel tier={tier} total={results.totalRawDefense} />
+          <div className="ro-stat-list ro-stat-list-inline">
             <div className="ro-stat">
               <span>PDMG Reduction</span>
               <strong>{formatPercent(results.pdmgReduction)}</strong>

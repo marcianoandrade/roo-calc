@@ -5,6 +5,7 @@ import {
   defenseTier,
   parsePercent,
   rawDefense,
+  tierLadder,
   tierProgress,
   toNumber,
 } from './defense';
@@ -70,6 +71,23 @@ describe('tiers', () => {
   it('is full at the top tier and clamps below zero', () => {
     expect(tierProgress(9000)).toEqual({ name: 'peak tank', floor: 5000, next: null, progress: 1 });
     expect(tierProgress(-50).progress).toBe(0);
+  });
+
+  it('lists every tier with its inclusive range of total raw DEF', () => {
+    const ladder = tierLadder();
+    expect(ladder.map((t) => t.name)).toEqual([
+      'holding sandal mode',
+      'light defense',
+      'mid defense',
+      'solid tank',
+      'strong shield',
+      'peak tank',
+    ]);
+    expect(ladder[0]).toEqual({ name: 'holding sandal mode', min: 0, max: 999 });
+    expect(ladder[3]).toEqual({ name: 'solid tank', min: 3000, max: 3999 });
+    expect(ladder[ladder.length - 1]).toEqual({ name: 'peak tank', min: 5000, max: null });
+    // Ranges are contiguous: each tier starts right after the previous one ends.
+    for (let i = 1; i < ladder.length; i++) expect(ladder[i].min).toBe((ladder[i - 1].max ?? NaN) + 1);
   });
 });
 

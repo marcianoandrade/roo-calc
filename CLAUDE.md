@@ -22,8 +22,11 @@ Leia o `README.md` para a visão geral e o formato dos cookies.
   (serialização compacta), `persistence.ts` (codecs + chaves de cookie + layout legado),
   `share.ts` (texto do botão Share + cópia para o clipboard), `format.ts`.
 - `src/components/` — `DefenseCalculator` monta as janelas; `RoWindow` é a moldura
-  estilo RO; `Field` tem `StatRow` e `Meter`; `TrendChart`, `HistoryTable`,
-  `SaveControls`, `ShareButton`.
+  estilo RO; `Field` tem `StatRow` e `Meter`; `TierPanel` (nome do patamar, barra e
+  tabela de patamares no hover); `TrendChart`, `HistoryTable`, `SaveControls`,
+  `ShareButton`.
+- Repositório **público** desde 05/09/2026 (só o Marciano tem push). README em inglês
+  com resumo em português; screenshot em `docs/screenshot.jpg`.
 - `src/styles.css` — CSS único com o tema RO (prefixo `ro-`). Fundo fixo:
   `public/bg/prontera.jpg` (arte enviada pelo Marciano). Janelas lado a lado na
   `.ro-grid` têm a mesma altura (ele pediu isso explicitamente).

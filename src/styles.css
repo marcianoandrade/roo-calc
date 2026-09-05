@@ -361,6 +361,104 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
+/* Tier block: big tier title over the bar; hover/focus reveals the full ladder. */
+.ro-tier {
+  position: relative;
+  cursor: help;
+}
+
+.ro-tier-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.ro-tier-name {
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #0f2a4d;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.ro-tier-name:focus-visible {
+  outline: 1px dotted #1a2330;
+  outline-offset: 2px;
+}
+
+.ro-tier-hint {
+  font-size: 10px;
+  color: var(--ro-muted);
+  white-space: nowrap;
+}
+
+.ro-tier-tip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 4px);
+  z-index: 5;
+  padding: 6px 8px;
+  background: #fffef5;
+  border: 1px solid #6b7f95;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.35);
+  font-size: 11px;
+  color: #1a2330;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.ro-tier:hover .ro-tier-tip,
+.ro-tier:focus-within .ro-tier-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ro-tier-tip-head {
+  margin: 0 0 4px;
+  color: #5a6978;
+}
+
+.ro-tier-tip table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ro-tier-tip td {
+  padding: 2px 4px;
+  border-top: 1px solid #e3e6dc;
+  text-transform: capitalize;
+}
+
+.ro-tier-tip td.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+}
+
+.ro-tier-tip tr.current td {
+  background: #e9f1fb;
+  color: #0f2a4d;
+  font-weight: bold;
+}
+
+.ro-tier-tip tr.current td:first-child::before {
+  content: '▸ ';
+}
+
+/* PDMG and MDMG reduction share one line. */
+.ro-stat-list-inline {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 12px;
+}
+
 .ro-sandal {
   display: inline-grid;
   place-items: center;

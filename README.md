@@ -1,90 +1,133 @@
-# roo-calc
+# roo-calc — Ragnarok Origin Defense Calculator
 
-Calculadora de defesa do **Ragnarok Origin**, feita com inspiração na
-[Defense Calculator original](https://roo-calc.vercel.app/), com visual das janelas do
-cliente clássico do Ragnarok e três adições:
+A small, static web app that turns the **Equipment PDEF / MDEF** numbers from your
+Ragnarok Origin character sheet into **Raw PDEF / Raw MDEF**, keeps a history of the
+values you save, and charts your progress over time. Everything is stored in your
+browser's cookies; nothing is sent to a server.
 
-- **Lembra o que você digitou por último.**
-- **Botão "Save snapshot"** que grava data, rótulo opcional e os valores do momento.
-- **Gráficos de acompanhamento** de Raw PDEF e Raw MDEF ao longo do tempo, com tabela
-  para carregar/excluir.
+The look imitates the windows of the classic Ragnarok Online client. The page was
+created with inspiration from the original
+[Defense Calculator (roo-calc.vercel.app)](https://roo-calc.vercel.app/).
 
-Tudo é gravado **em cookies** do navegador (nenhum servidor envolvido).
+![Screenshot of roo-calc](docs/screenshot.jpg)
 
-## Telas (janelas)
+## Features
 
-| Janela | Conteúdo |
-|--------|----------|
-| **Status** | Os 6 inputs (Equipment PDEF/MDEF, PDEF/MDEF %, PDMG/MDMG Reduction), explicação do cálculo, rótulo do snapshot e os botões Calculate (recalcula sob demanda; digitar já recalcula), Save snapshot e Reset. |
-| **Basic Info** | Raw PDEF, Raw MDEF, total, botão **Share** (copia `Raw Pdef: {valor} Raw Mdef: {valor}` para a área de transferência), barra estilo EXP com a classificação atual ("solid tank" etc.) e o próximo patamar, reduções (referência). |
-| **Progress tracking** | Dois gráficos: Raw PDEF e Raw MDEF por snapshot. |
-| **Saved snapshots** | Tabela com Load (restaura os inputs), Delete e Clear all. |
+- **Raw DEF from equipment stats** using the client formula
+  `equipment DEF / (1 + equipment DEF%)`, recalculated as you type (a *Calculate*
+  button is there for people who like pressing one).
+- **Remembers your last inputs** between visits.
+- **Snapshots**: press *Save snapshot* (optionally with a label such as
+  "after +10 armor") to record the current values with a timestamp.
+- **Progress charts** of Raw PDEF and Raw MDEF across your snapshots, plus a table
+  where you can reload or delete any snapshot.
+- **Tier ladder**: the total raw DEF (PDEF + MDEF) is graded from *holding sandal
+  mode* up to *peak tank*, with an EXP-style bar showing how far the next tier is.
+  Hover the tier name to see every range.
+- **Share** button: copies `Raw Pdef: {value} Raw Mdef: {value}` to your clipboard,
+  ready to paste into the game chat.
+- **Cookies only**: no accounts, no backend, no tracking.
 
-O rodapé imita a caixa de chat do jogo e traz o link para a página original e para
-este repositório. O fundo é a arte em `public/bg/prontera.jpg` (referenciada em
-`src/styles.css`); para trocar, substitua o arquivo ou ajuste a URL no CSS.
+## How to use
 
-## Rodando
+1. Open your character details in game and click **PDEF** and **MDEF** in the
+   General Stats tab. Note the *Equipment PDEF* and *Equipment MDEF* values.
+2. In *Special stats*, note **Equipment PDEF %** and **Equipment MDEF %**
+   (type `23` or `23%`, both work).
+3. Optionally fill **PDMG / MDMG Reduction**. They are shown as a reference only and
+   do not affect the raw DEF.
+4. Read the results in the **Basic Info** window, press **Save snapshot** whenever
+   your gear changes, and watch the charts grow.
+
+## Where the data lives
+
+All cookies use the `roo.` prefix, `SameSite=Lax`, `path=/` and expire after one
+year. Clearing the site's cookies wipes everything.
+
+| Cookie | Content |
+|--------|---------|
+| `roo.def.inputs` | The last values typed in the Status window |
+| `roo.def.history` | Saved snapshots (timestamp, label, inputs) |
+
+Implementation notes (`src/lib/cookies.ts`, `src/lib/codec.ts`):
+
+- A single cookie holds about 4 KB, so each key is split into `key.0`, `key.1`, …
+  with the chunk count in `key.n` (up to 8 chunks of 3000 characters).
+- Records use a compact `field|field|…` / `record~record` layout instead of JSON,
+  which triples in size once escaped for cookies.
+- History is capped at **80 snapshots**; the oldest is dropped when the cap is
+  reached. Browsers send every cookie with every request, and very large headers
+  get rejected by servers and CDNs, hence the cap.
+- The field order in `DEFENSE_FIELDS` (`src/lib/defense.ts`) is the on-disk format.
+  Never reorder it; add new fields at the end. The layout used by the first version
+  (which also stored Ignore PDEF/MDEF) is still readable.
+
+## Development
 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # vitest (fórmulas, codecs, cookies)
+npm test           # vitest: formulas, codecs, cookie store, share text
 npm run build      # tsc --noEmit + vite build -> dist/
-npm run preview    # serve o build
+npm run preview    # serve the production build
 ```
 
-Deploy: é um site estático (Vite). Na Vercel basta importar o repositório; o preset
-"Vite" já usa `npm run build` e publica `dist/`.
+Stack: React 19 · TypeScript · Vite 7 · Recharts 3 · Vitest 3 (jsdom).
+The UI is English; docs and commit messages are in Portuguese.
 
-## Como os cookies são usados
-
-Todos os cookies têm prefixo `roo.`, `SameSite=Lax`, `path=/` e validade de 1 ano.
-
-| Cookie | Conteúdo |
-|--------|----------|
-| `roo.def.inputs` | Últimos inputs digitados |
-| `roo.def.history` | Snapshots salvos |
-
-Detalhes de implementação (`src/lib/cookies.ts`, `src/lib/codec.ts`):
-
-- Um cookie aguenta ~4 KB, então cada chave é dividida em `chave.0`, `chave.1`, ... com a
-  contagem em `chave.n` (máximo 8 pedaços de 3000 caracteres).
-- Os registros usam um formato compacto (`campo|campo|...` e `registro~registro`) em vez de
-  JSON, porque JSON escapado para cookie fica ~3x maior.
-- Histórico limitado a **80 snapshots**; ao passar disso o mais antigo é descartado.
-  O limite existe porque o navegador envia todos os cookies em cada requisição, e headers
-  muito grandes são rejeitados por servidores/CDNs.
-- **A ordem dos campos em `DEFENSE_FIELDS` faz parte do formato gravado.** Nunca reordene;
-  para adicionar campo, acrescente no final. O layout da primeira versão (8 campos, com
-  Ignore PDEF/MDEF) continua sendo lido (`LEGACY_DEFENSE_FIELDS_V1`).
-- Cookies de versões anteriores da página (`roo.tab`, `roo.pvp.*`) são apagados ao abrir.
-
-## Estrutura
+### Project layout
 
 ```
-public/bg/prontera.jpg   arte de fundo
+public/bg/prontera.jpg     background artwork
 src/
   lib/
-    defense.ts           fórmulas e patamares (port fiel do site original)
-    cookies.ts           store chave/valor em cookies (chunking, escape)
-    codec.ts             serialização compacta de registros
-    history.ts           hooks useCookieState / useCookieHistory
-    persistence.ts       codecs dos inputs/snapshots + nomes dos cookies
-    format.ts            formatação de números e datas
-    *.test.ts            testes (vitest + jsdom)
+    defense.ts             formulas and tier ladder (faithful port of the original site)
+    cookies.ts             chunked, escaped cookie key/value store
+    codec.ts               compact record serialization
+    history.ts             useCookieState / useCookieHistory hooks
+    persistence.ts         input/snapshot codecs, cookie keys, legacy layout
+    share.ts               Share text + clipboard copy (write only, never reads)
+    format.ts              number and date formatting
+    *.test.ts              unit tests
   components/
-    DefenseCalculator.tsx  monta as janelas
-    RoWindow.tsx           janela estilo cliente RO (barra de título + corpo)
-    Field.tsx              StatRow (linha da janela Status) e Meter (barra HP/EXP)
-    TrendChart.tsx         gráfico de linhas (Recharts)
-    HistoryTable.tsx       tabela de snapshots (load / delete / clear)
-    SaveControls.tsx       rótulo + botão salvar + feedback
+    DefenseCalculator.tsx  assembles the windows
+    RoWindow.tsx           classic-client window chrome (title bar + body)
+    Field.tsx              StatRow (Status window line) and Meter (HP/EXP-style bar)
+    TierPanel.tsx          tier name, bar and the hover ladder
+    TrendChart.tsx         line chart (Recharts)
+    HistoryTable.tsx       snapshot table (load / delete / clear)
+    SaveControls.tsx       label input, Calculate, Save snapshot, Reset
+    ShareButton.tsx        copies the share text to the clipboard
   App.tsx, main.tsx, styles.css
 ```
 
-## Stack
+### Deploying
 
-React 19 · TypeScript · Vite 7 · Recharts 3 · Vitest 3 (jsdom).
+It is a static Vite site. On Vercel, import the repository and keep the *Vite*
+preset (`npm run build`, output `dist/`). Any static host works.
 
-Ferramenta feita por fã. Ragnarok Online e suas artes são © Gravity Co., Ltd.
+## Credits
+
+- Formulas and field descriptions come from the original
+  [Defense Calculator](https://roo-calc.vercel.app/); this project adds persistence,
+  snapshots, charts and the classic-client look.
+- Fan-made tool. Ragnarok Online, Ragnarok Origin and related artwork are
+  © Gravity Co., Ltd. Not affiliated with or endorsed by Gravity.
+
+---
+
+## Resumo em português
+
+Calculadora de defesa do **Ragnarok Origin**: converte Equipment PDEF/MDEF (e os %)
+em **Raw PDEF / Raw MDEF**, lembra o que você digitou, salva *snapshots* com data e
+rótulo, mostra gráficos da evolução e classifica a defesa total em patamares (de
+*holding sandal mode* a *peak tank*). O botão **Share** copia
+`Raw Pdef: {valor} Raw Mdef: {valor}` para colar no chat do jogo.
+
+Tudo fica nos **cookies do navegador** (prefixo `roo.`, validade de 1 ano, limite de
+80 snapshots). Não existe servidor nem conta.
+
+Para rodar: `npm install` e `npm run dev` (porta 5173). Testes com `npm test`; build
+com `npm run build`. Feito com inspiração na
+[página original](https://roo-calc.vercel.app/). Ferramenta de fã; Ragnarok é
+© Gravity Co., Ltd.
