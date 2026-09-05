@@ -27,7 +27,7 @@ created with inspiration from the original
 - **Share** button: copies `Raw Pdef: {value} Raw Mdef: {value}` to your clipboard,
   ready to paste into the game chat.
 - **Cookies only**: no accounts, no backend, no tracking.
-- **Three languages**: English, Português (Brasil) and Español. The page picks the
+- **Three languages** (flag buttons at the top-right): English, Português (Brasil) and Español. The page picks the
   browser language and remembers the one you choose. Numbers and dates follow the
   language too, and decimal commas are accepted in the inputs (`43,52`).
 

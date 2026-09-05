@@ -800,26 +800,44 @@ a {
   }
 }
 
-/* ---------------- Language switcher ---------------- */
+/* ---------------- Language switcher (flags, top-right) ---------------- */
 
 .ro-lang {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
-  margin-bottom: -4px;
+  margin-bottom: -6px;
 }
 
-.ro-lang-label {
-  margin-right: 2px;
-  font-size: 11px;
-  font-weight: bold;
-  color: #f3f6f9;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+.ro-flag-button {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  opacity: 0.72;
+  filter: saturate(0.75);
 }
 
-.ro-lang-button {
-  padding: 0 8px;
+.ro-flag-button svg {
+  display: block;
+  width: 20px;
+  height: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 1px;
+}
+
+.ro-flag-button:hover {
+  opacity: 1;
+  filter: none;
+}
+
+.ro-flag-button.ro-button-active {
+  opacity: 1;
+  filter: none;
+  border-color: #2d4d78;
+  box-shadow:
+    inset 1px 1px 2px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.6);
 }
 
 .ro-button-active,
