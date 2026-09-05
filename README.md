@@ -21,8 +21,8 @@ Tudo é gravado **em cookies** do navegador (nenhum servidor envolvido).
 | **Saved snapshots** | Tabela com Load (restaura os inputs), Delete e Clear all. |
 
 O rodapé imita a caixa de chat do jogo e traz o link para a página original e para
-este repositório. O fundo é sorteado a cada carregamento entre as artes em `public/bg/`
-(como as telas de login do cliente clássico).
+este repositório. O fundo é a arte em `public/bg/prontera.jpg` (referenciada em
+`src/styles.css`); para trocar, substitua o arquivo ou ajuste a URL no CSS.
 
 ## Rodando
 
@@ -63,11 +63,10 @@ Detalhes de implementação (`src/lib/cookies.ts`, `src/lib/codec.ts`):
 ## Estrutura
 
 ```
-public/bg/               artes de fundo (woe.jpg, castle.jpg, party.jpg)
+public/bg/prontera.jpg   arte de fundo
 src/
   lib/
     defense.ts           fórmulas e patamares (port fiel do site original)
-    background.ts        sorteio da arte de fundo
     cookies.ts           store chave/valor em cookies (chunking, escape)
     codec.ts             serialização compacta de registros
     history.ts           hooks useCookieState / useCookieHistory

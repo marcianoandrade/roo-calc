@@ -18,13 +18,17 @@ Leia o `README.md` para a visão geral e o formato dos cookies.
 ## Estrutura
 
 - `src/lib/` — lógica pura, sem React (exceto `history.ts`, que tem os hooks):
-  `defense.ts` (fórmulas e patamares), `background.ts` (sorteio do fundo), `cookies.ts`
-  (store com chunking), `codec.ts` (serialização compacta), `persistence.ts` (codecs +
-  chaves de cookie + layout legado), `format.ts`.
+  `defense.ts` (fórmulas e patamares), `cookies.ts` (store com chunking), `codec.ts`
+  (serialização compacta), `persistence.ts` (codecs + chaves de cookie + layout legado),
+  `share.ts` (texto do botão Share + cópia para o clipboard), `format.ts`.
 - `src/components/` — `DefenseCalculator` monta as janelas; `RoWindow` é a moldura
   estilo RO; `Field` tem `StatRow` e `Meter`; `TrendChart`, `HistoryTable`,
-  `SaveControls`.
-- `src/styles.css` — CSS único com o tema RO (prefixo `ro-`). Fundos em `public/bg/`.
+  `SaveControls`, `ShareButton`.
+- `src/styles.css` — CSS único com o tema RO (prefixo `ro-`). Fundo fixo:
+  `public/bg/prontera.jpg` (arte enviada pelo Marciano). Janelas lado a lado na
+  `.ro-grid` têm a mesma altura (ele pediu isso explicitamente).
+- O botão Share **só escreve** no clipboard; nunca ler o clipboard (dispara pedido de
+  permissão do navegador, que ele não quer).
 - Escopo decidido pelo Marciano (05/09/2026): **só Raw PDEF/MDEF importam**. Sem aba
   PvP, sem campos de Ignore DEF, sem janela de guia. Não reintroduzir sem ele pedir.
 

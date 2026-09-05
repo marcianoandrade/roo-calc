@@ -91,7 +91,7 @@ export function DefenseCalculator() {
               <strong>{formatPercent(results.mdmgReduction)}</strong>
             </div>
           </div>
-          <p className="ro-section-title">How it is calculated</p>
+          <p className="ro-section-title ro-push-bottom">How it is calculated</p>
           <p className="ro-help">
             Raw defense uses the visible client formula: <strong>equipment DEF / (1 + equipment DEF%)</strong>.
             Reduction values are shown as a mitigation reference only.

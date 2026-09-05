@@ -31,14 +31,15 @@ body {
   min-height: 100vh;
   font: 12px/1.35 Tahoma, Verdana, 'Segoe UI', sans-serif;
   color: var(--ro-ink);
-  background: #0b0d12 var(--ro-bg, url('/bg/party.jpg')) var(--ro-bg-pos, center 30%) / cover no-repeat fixed;
+  background: #9cc3e6 url('/bg/prontera.jpg') center center / cover no-repeat fixed;
 }
 
+/* Soft vignette so the windows stay readable over the bright artwork. */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: radial-gradient(ellipse at center, rgba(5, 8, 14, 0.3), rgba(5, 8, 14, 0.78));
+  background: radial-gradient(ellipse at center, rgba(10, 16, 30, 0.08), rgba(10, 16, 30, 0.42));
   pointer-events: none;
   z-index: 0;
 }
@@ -59,11 +60,38 @@ a {
   gap: 14px;
 }
 
+/* Side-by-side windows share the row height, like docked client windows. */
 .ro-grid {
   display: grid;
   grid-template-columns: 360px minmax(0, 1fr);
   gap: 14px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.ro-grid > .ro-window {
+  display: flex;
+  flex-direction: column;
+}
+
+.ro-grid > .ro-window > .ro-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ro-grid > .ro-window > .ro-body > form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ro-grid > .ro-window > .ro-body > form > .ro-status-grid {
+  flex: 1;
+}
+
+.ro-push-bottom {
+  margin-top: auto !important;
+  padding-top: 10px;
 }
 
 .ro-col {
