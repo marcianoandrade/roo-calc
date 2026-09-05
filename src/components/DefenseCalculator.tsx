@@ -53,59 +53,57 @@ export function DefenseCalculator() {
       <div className="ro-grid">
         <RoWindow title={t.windows.status} className="ro-window-status">
           <form onSubmit={(e) => e.preventDefault()}>
+            {/* Row-major DOM (PDEF, MDEF, PDEF %, MDEF %, PDMG, MDMG) so Tab walks across each pair;
+                the grid still paints two columns headed Physical / Magic. */}
             <div className="ro-status-grid">
-              <div className="ro-status-col">
-                <p className="ro-section-title">{t.status.physical}</p>
-                <StatRow
-                  id="equipment-pdef-value"
-                  label={t.status.pdef}
-                  description={t.status.pdefHelp}
-                  value={inputs.pdef}
-                  onChange={update('pdef')}
-                />
-                <StatRow
-                  id="equipment-pdef-percent"
-                  label={t.status.pdefPercent}
-                  description={t.status.pdefPercentHelp}
-                  value={inputs.equipPdefPercent}
-                  onChange={update('equipPdefPercent')}
-                  placeholder={t.status.pdefPercentPlaceholder}
-                />
-                <StatRow
-                  id="pdmg-reduction"
-                  label={t.status.pdmg}
-                  description={t.status.pdmgHelp}
-                  value={inputs.pdmgReduction}
-                  onChange={update('pdmgReduction')}
-                  placeholder={t.status.pdmgPlaceholder}
-                />
-              </div>
-              <div className="ro-status-col">
-                <p className="ro-section-title">{t.status.magic}</p>
-                <StatRow
-                  id="equipment-mdef-value"
-                  label={t.status.mdef}
-                  description={t.status.mdefHelp}
-                  value={inputs.mdef}
-                  onChange={update('mdef')}
-                />
-                <StatRow
-                  id="equipment-mdef-percent"
-                  label={t.status.mdefPercent}
-                  description={t.status.mdefPercentHelp}
-                  value={inputs.equipMdefPercent}
-                  onChange={update('equipMdefPercent')}
-                  placeholder={t.status.mdefPercentPlaceholder}
-                />
-                <StatRow
-                  id="mdmg-reduction"
-                  label={t.status.mdmg}
-                  description={t.status.mdmgHelp}
-                  value={inputs.mdmgReduction}
-                  onChange={update('mdmgReduction')}
-                  placeholder={t.status.mdmgPlaceholder}
-                />
-              </div>
+              <p className="ro-section-title">{t.status.physical}</p>
+              <p className="ro-section-title">{t.status.magic}</p>
+              <StatRow
+                id="equipment-pdef-value"
+                label={t.status.pdef}
+                description={t.status.pdefHelp}
+                value={inputs.pdef}
+                onChange={update('pdef')}
+              />
+              <StatRow
+                id="equipment-mdef-value"
+                label={t.status.mdef}
+                description={t.status.mdefHelp}
+                value={inputs.mdef}
+                onChange={update('mdef')}
+              />
+              <StatRow
+                id="equipment-pdef-percent"
+                label={t.status.pdefPercent}
+                description={t.status.pdefPercentHelp}
+                value={inputs.equipPdefPercent}
+                onChange={update('equipPdefPercent')}
+                placeholder={t.status.pdefPercentPlaceholder}
+              />
+              <StatRow
+                id="equipment-mdef-percent"
+                label={t.status.mdefPercent}
+                description={t.status.mdefPercentHelp}
+                value={inputs.equipMdefPercent}
+                onChange={update('equipMdefPercent')}
+                placeholder={t.status.mdefPercentPlaceholder}
+              />
+              <StatRow
+                id="pdmg-reduction"
+                label={t.status.pdmg}
+                description={t.status.pdmgHelp}
+                value={inputs.pdmgReduction}
+                onChange={update('pdmgReduction')}
+                placeholder={t.status.pdmgPlaceholder}
+              />
+              <StatRow
+                id="mdmg-reduction"
+                label={t.status.mdmg}
+                description={t.status.mdmgHelp}
+                value={inputs.mdmgReduction}
+                onChange={update('mdmgReduction')}
+                placeholder={t.status.mdmgPlaceholder}
+              />
             </div>
             <div className="ro-method">
               <p className="ro-section-title">{t.status.howTitle}</p>

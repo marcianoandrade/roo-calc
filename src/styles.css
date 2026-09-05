@@ -521,7 +521,9 @@ a {
   gap: 0 16px;
 }
 
-.ro-status-col > .ro-section-title {
+/* Row-major grid: headers on the first row, then one PDEF/MDEF pair per row. */
+.ro-status-grid > .ro-section-title {
+  margin-top: 0; /* the adjacent-title spacing rule must not push "Magic" down */
   padding-bottom: 3px;
   border-bottom: 1px solid var(--ro-border-soft);
 }
@@ -754,13 +756,23 @@ a {
     padding: 12px 10px;
   }
 
-  .ro-status-grid,
   .ro-actions {
     grid-template-columns: 1fr;
   }
 
+  /* Keep the PDEF/MDEF pairs side by side on phones; stack label over input. */
+  .ro-status-grid {
+    gap: 0 10px;
+  }
+
+  .ro-row-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+  }
+
   .ro-row-head .ro-input {
-    width: 100px;
+    width: 100%;
   }
 
   .ro-table thead {
