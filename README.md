@@ -15,7 +15,7 @@ Tudo é gravado **em cookies** do navegador (nenhum servidor envolvido).
 
 | Janela | Conteúdo |
 |--------|----------|
-| **Basic Info** | Raw PDEF, Raw MDEF, total, barra estilo EXP com a classificação atual ("solid tank" etc.) e o próximo patamar, reduções (referência). |
+| **Basic Info** | Raw PDEF, Raw MDEF, total, botão **Share** (copia `Raw Pdef: {valor} Raw Mdef: {valor}` para a área de transferência), barra estilo EXP com a classificação atual ("solid tank" etc.) e o próximo patamar, reduções (referência). |
 | **Status** | Os 6 inputs (Equipment PDEF/MDEF, PDEF/MDEF %, PDMG/MDMG Reduction), rótulo do snapshot, botões Save/Reset. |
 | **Progress tracking** | Dois gráficos: Raw PDEF e Raw MDEF por snapshot. |
 | **Saved snapshots** | Tabela com Load (restaura os inputs), Delete e Clear all. |

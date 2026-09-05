@@ -348,6 +348,42 @@ a {
   font-size: 14px;
 }
 
+.ro-share {
+  margin: 8px 0 6px;
+}
+
+.ro-share-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ro-share-text {
+  flex: 1;
+  min-width: 0;
+  height: 20px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: #fff;
+  border: 1px solid #7b8fa5;
+  box-shadow: inset 1px 1px 0 #d7dfe7;
+  font: 11px/1 Tahoma, Verdana, 'Segoe UI', sans-serif;
+  color: #0f2a4d;
+  user-select: all;
+}
+
+.ro-share .ro-feedback {
+  margin: 3px 0 0;
+  min-height: 1.3em;
+  font-size: 10px;
+  color: #2c5c2c;
+}
+
 /* ---------------- Status window (inputs) ---------------- */
 
 .ro-status-grid {

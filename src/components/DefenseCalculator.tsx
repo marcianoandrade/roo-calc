@@ -7,7 +7,9 @@ import { Meter, StatRow } from './Field';
 import { HistoryTable, type HistoryColumn } from './HistoryTable';
 import { RoWindow } from './RoWindow';
 import { SaveControls } from './SaveControls';
+import { ShareButton } from './ShareButton';
 import { TrendChart, type TrendPoint } from './TrendChart';
+import { formatShareText } from '../lib/share';
 
 const SANDAL_IMAGE = 'https://emoji.fileformat.info/png/1fa74.png';
 
@@ -72,6 +74,7 @@ export function DefenseCalculator() {
             <span>Total raw DEF</span>
             <strong>{formatNumber(results.totalRawDefense)}</strong>
           </div>
+          <ShareButton text={formatShareText(results.rawPdef, results.rawMdef)} />
           <Meter label="Tier" progress={tier.progress} text={tierText} />
           <p className="ro-help">
             {tier.next
