@@ -50,6 +50,9 @@ Leia o `README.md` para a visão geral e o formato dos cookies.
   pelo navegador e guardado em `roo.lang`. O texto do Share ("Raw Pdef: ...") não é
   traduzido, é o formato pedido para o chat do jogo. Documentação e commits em português.
 - Licença MIT (`LICENSE`, `package.json`).
+- Hospedado na Vercel (deploy automático a cada push na `main`). `@vercel/analytics`
+  (`<Analytics />` em `main.tsx`, só em produção) conta visitas; não adicionar outro
+  rastreador nem enviar os valores digitados para lugar nenhum.
 - Toda função nova em `src/lib/` precisa de teste em `*.test.ts` ao lado.
 - Gráficos: cores das séries fixas em `SERIES_COLORS` (`TrendChart.tsx`), validadas para
   daltonismo no fundo claro `#fbfcfd`. Um eixo Y só; sem eixo duplo.

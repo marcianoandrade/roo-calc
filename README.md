@@ -26,7 +26,9 @@ created with inspiration from the original
   Hover the tier name to see every range.
 - **Share** button: copies `Raw Pdef: {value} Raw Mdef: {value}` to your clipboard,
   ready to paste into the game chat.
-- **Cookies only**: no accounts, no backend, no tracking.
+- **Cookies only**: no accounts, no backend. Your stats never leave the browser. The
+  hosted site counts page views with [Vercel Web Analytics](https://vercel.com/docs/analytics)
+  (cookieless, no personal data, and it never sees what you type).
 - **Three languages** (flag buttons at the top-right): English, Português (Brasil) and Español. The page picks the
   browser language and remembers the one you choose. Numbers and dates follow the
   language too, and decimal commas are accepted in the inputs (`43,52`).
@@ -112,6 +114,11 @@ src/
 It is a static Vite site. On Vercel, import the repository and keep the *Vite*
 preset (`npm run build`, output `dist/`). Any static host works.
 
+Page views come from `@vercel/analytics` (`<Analytics />` in `src/main.tsx`,
+rendered only in production builds). Enable *Web Analytics* on the Vercel project
+for the numbers to show up; on other hosts the component simply finds no script
+and stays silent.
+
 ## Credits
 
 - Formulas and field descriptions come from the original
@@ -136,7 +143,8 @@ rótulo, mostra gráficos da evolução e classifica a defesa total em patamares
 `Raw Pdef: {valor} Raw Mdef: {valor}` para colar no chat do jogo.
 
 Tudo fica nos **cookies do navegador** (prefixo `roo.`, validade de 1 ano, limite de
-80 snapshots). Não existe servidor nem conta.
+80 snapshots). Não existe servidor nem conta. O site hospedado conta visitas com a
+Vercel Web Analytics (sem cookies e sem dados pessoais).
 
 A interface está em inglês, português do Brasil e espanhol: o idioma do navegador é
 detectado e a escolha fica guardada no cookie `roo.lang`.
