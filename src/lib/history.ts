@@ -17,6 +17,15 @@ export interface SnapshotCodec<T> {
 /** Hard cap so the cookie header stays small (browsers and hosts reject very large headers). */
 export const MAX_HISTORY = 80;
 
+/**
+ * Oldest first. Entries are kept chronological so the charts read left to right and
+ * the cookie budget always drops the oldest snapshot, even when a past reading is
+ * added after newer ones.
+ */
+export function sortSnapshots<T>(items: readonly Snapshot<T>[]): Snapshot<T>[] {
+  return [...items].sort((a, b) => a.at - b.at);
+}
+
 export function encodeSnapshots<T>(items: readonly Snapshot<T>[], codec: SnapshotCodec<T>): string {
   return encodeList(items.map((s) => [s.at.toString(36), s.label, ...codec.toFields(s.data)]));
 }
@@ -60,21 +69,22 @@ export function useCookieState<T>(
 
 export interface CookieHistory<T> {
   entries: Snapshot<T>[];
-  add(data: T, label: string): void;
+  /** `at` defaults to now; pass it to record a past reading. */
+  add(data: T, label: string, at?: number): void;
   remove(index: number): void;
   clear(): void;
   max: number;
 }
 
-/** Append-only history of snapshots persisted in cookies, oldest entries dropped past `max`. */
+/** History of snapshots persisted in cookies, kept chronological, oldest entries dropped past `max`. */
 export function useCookieHistory<T>(key: string, codec: SnapshotCodec<T>, max = MAX_HISTORY): CookieHistory<T> {
-  const [entries, setEntries] = useState<Snapshot<T>[]>(() => decodeSnapshots(getItem(key), codec));
+  const [entries, setEntries] = useState<Snapshot<T>[]>(() => sortSnapshots(decodeSnapshots(getItem(key), codec)));
   const latest = useRef(entries);
   latest.current = entries;
 
   const persist = useCallback(
     (next: Snapshot<T>[]) => {
-      let list = next.slice(-max);
+      let list = sortSnapshots(next).slice(-max);
       // Drop the oldest entries until the payload fits the cookie budget.
       while (list.length > 0 && !setItem(key, encodeSnapshots(list, codec))) {
         list = list.slice(1);
@@ -86,7 +96,8 @@ export function useCookieHistory<T>(key: string, codec: SnapshotCodec<T>, max = 
   );
 
   const add = useCallback(
-    (data: T, label: string) => persist([...latest.current, { at: Date.now(), label: label.trim(), data }]),
+    (data: T, label: string, at: number = Date.now()) =>
+      persist([...latest.current, { at, label: label.trim(), data }]),
     [persist],
   );
   const remove = useCallback((index: number) => persist(latest.current.filter((_, i) => i !== index)), [persist]);

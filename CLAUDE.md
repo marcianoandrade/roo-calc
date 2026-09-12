@@ -33,7 +33,8 @@ Ragnarok sobre uma arte de Prontera. Interface em inglês, português (BR) e esp
   `LocaleContext.tsx` (`LocaleProvider`/`useLocale`).
 - `src/components/` — `DefenseCalculator` monta as janelas; `RoWindow` é a moldura estilo
   RO; `Field` (`StatRow`, `Meter`); `TierPanel` (patamar, barra e tabela no hover);
-  `TrendChart`, `HistoryTable`, `SaveControls` (Calculate/Save/Reset), `ShareButton`,
+  `TrendChart`, `HistoryTable`, `SaveControls` (Calculate/Save/Reset),
+  `ManualEntryForm` (leitura antiga: data + Raw PDEF/MDEF + DEF % opcionais), `ShareButton`,
   `LanguageSwitcher` + `Flags` (bandeirinhas SVG).
 - `src/styles.css` — CSS único com o tema RO (prefixo `ro-`). Fundo fixo em
   `public/bg/prontera.jpg`. `src/vite-env.d.ts` dá os tipos de `import.meta.env`.
@@ -55,6 +56,13 @@ Ragnarok sobre uma arte de Prontera. Interface em inglês, português (BR) e esp
 
 ## Regras do projeto
 
+- **Leitura antiga** (`ManualEntryForm`): pede data, Raw PDEF/MDEF e os DEF %
+  (opcionais, mesma ordem de Tab da Status). `inputsFromRawDefense` deriva a DEF de
+  equipamento a partir do raw + % (`equipmentDefense`, a fórmula invertida) e deixa as
+  reduções vazias — o raw calculado bate exatamente com o digitado, com % em branco ou
+  inválido virando 0, e o layout dos cookies não muda. O histórico é sempre ordenado
+  por data (`sortSnapshots`), então o corte por `MAX_HISTORY` continua descartando o
+  mais antigo.
 - **Fórmulas são um port fiel do site original.** Não "corrigir" a matemática por conta
   própria; mudanças só a pedido, com teste atualizado.
 - **Ordem dos campos gravados é contrato:** `DEFENSE_FIELDS` (`defense.ts`) define o

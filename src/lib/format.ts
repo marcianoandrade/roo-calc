@@ -41,6 +41,24 @@ export function formatDateTime(ms: number, locale: Locale = 'en'): string {
   return dateFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(new Date(ms));
 }
 
+/** Value for an `<input type="datetime-local">`: local time as "YYYY-MM-DDTHH:mm". */
+export function toDateTimeInputValue(ms: number): string {
+  const d = new Date(ms);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Reads that same layout back as local time; null when the text is not a real date. */
+export function parseDateTimeInput(value: string): number | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?$/.exec(value.trim());
+  if (!match) return null;
+  const [, year, month, day, hour = '0', minute = '0'] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute));
+  // Date silently rolls over impossible days (2026-02-31 -> March 3), so check it back.
+  if (date.getMonth() !== Number(month) - 1 || date.getDate() !== Number(day)) return null;
+  return date.getTime();
+}
+
 export function formatAxisDate(ms: number, locale: Locale = 'en'): string {
   return dateFormat(locale, { day: '2-digit', month: '2-digit' }).format(new Date(ms));
 }

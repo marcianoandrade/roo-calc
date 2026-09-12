@@ -3,7 +3,9 @@ import {
   computeDefense,
   DEFAULT_DEFENSE_INPUTS,
   defenseTier,
+  inputsFromRawDefense,
   normalizeDecimal,
+  parseDefenseValue,
   parsePercent,
   rawDefense,
   tierLadder,
@@ -44,6 +46,68 @@ describe('toNumber', () => {
     expect(toNumber('12,5')).toBe(12.5);
     expect(toNumber('2.318,25')).toBe(2318.25);
     expect(parsePercent('43,52%')).toBeCloseTo(0.4352);
+  });
+});
+
+describe('parseDefenseValue', () => {
+  it('accepts points and commas', () => {
+    expect(parseDefenseValue('2328.46')).toBe(2328.46);
+    expect(parseDefenseValue(' 2.328,46 ')).toBe(2328.46);
+    expect(parseDefenseValue('0')).toBe(0);
+  });
+
+  it('rejects blanks, text and negatives', () => {
+    expect(parseDefenseValue('')).toBeNull();
+    expect(parseDefenseValue('   ')).toBeNull();
+    expect(parseDefenseValue('abc')).toBeNull();
+    expect(parseDefenseValue('-1')).toBeNull();
+  });
+});
+
+describe('inputsFromRawDefense', () => {
+  it('keeps the raw values when no percentage is given', () => {
+    expect(inputsFromRawDefense({ rawPdef: 1000, rawMdef: 500 })).toEqual({
+      pdef: '1000',
+      mdef: '500',
+      equipPdefPercent: '',
+      equipMdefPercent: '',
+      pdmgReduction: '',
+      mdmgReduction: '',
+    });
+  });
+
+  it('derives the equipment DEF from the percentages, keeping them as typed', () => {
+    const inputs = inputsFromRawDefense({
+      rawPdef: 2328.46,
+      rawMdef: 710.34,
+      equipPdefPercent: ' 23% ',
+      equipMdefPercent: '16',
+    });
+    expect(inputs.pdef).toBe('2864.0058');
+    expect(inputs.equipPdefPercent).toBe('23%');
+    expect(inputs.equipMdefPercent).toBe('16');
+  });
+
+  it('computes back to the raw values that were typed', () => {
+    for (const percent of ['', '0', '23', '43,5%']) {
+      const results = computeDefense(
+        inputsFromRawDefense({
+          rawPdef: 2328.46,
+          rawMdef: 710.34,
+          equipPdefPercent: percent,
+          equipMdefPercent: percent,
+        }),
+      );
+      expect(results.rawPdef, percent).toBeCloseTo(2328.46);
+      expect(results.rawMdef, percent).toBeCloseTo(710.34);
+      expect(results.totalRawDefense, percent).toBeCloseTo(3038.8);
+    }
+  });
+
+  it('ignores text that is not a percentage instead of distorting the raw value', () => {
+    const inputs = inputsFromRawDefense({ rawPdef: 1000, rawMdef: 500, equipPdefPercent: 'abc' });
+    expect(inputs.pdef).toBe('1000');
+    expect(computeDefense(inputs).rawPdef).toBe(1000);
   });
 });
 

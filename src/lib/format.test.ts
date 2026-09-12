@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { formatCompact, formatFixed, formatNumber, formatPercent } from './format';
+import {
+  formatCompact,
+  formatFixed,
+  formatNumber,
+  formatPercent,
+  parseDateTimeInput,
+  toDateTimeInputValue,
+} from './format';
 
 describe('formatNumber', () => {
   it('uses thousands separators and at most two decimals', () => {
@@ -23,6 +30,25 @@ describe('formatFixed / formatPercent', () => {
     expect(formatPercent(0.4352)).toBe('43.52%');
     expect(formatPercent(0.5, 0)).toBe('50%');
     expect(formatPercent(0.4352, 2, 'pt-BR')).toBe('43,52%');
+  });
+});
+
+describe('datetime-local input value', () => {
+  it('round-trips a local date and time', () => {
+    const at = new Date(2026, 1, 28, 9, 5).getTime();
+    expect(toDateTimeInputValue(at)).toBe('2026-02-28T09:05');
+    expect(parseDateTimeInput('2026-02-28T09:05')).toBe(at);
+  });
+
+  it('treats a date without time as midnight', () => {
+    expect(parseDateTimeInput('2026-02-28')).toBe(new Date(2026, 1, 28, 0, 0).getTime());
+  });
+
+  it('rejects empty, malformed and impossible dates', () => {
+    expect(parseDateTimeInput('')).toBeNull();
+    expect(parseDateTimeInput('28/02/2026')).toBeNull();
+    expect(parseDateTimeInput('2026-02-31T10:00')).toBeNull();
+    expect(parseDateTimeInput('2026-13-01T10:00')).toBeNull();
   });
 });
 

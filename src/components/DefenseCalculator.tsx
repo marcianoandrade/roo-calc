@@ -1,12 +1,13 @@
 import { useLocale } from '../i18n/LocaleContext';
 import { round2 } from '../lib/codec';
-import { computeDefense, DEFAULT_DEFENSE_INPUTS, type DefenseInputs } from '../lib/defense';
+import { computeDefense, DEFAULT_DEFENSE_INPUTS, inputsFromRawDefense, type DefenseInputs } from '../lib/defense';
 import { formatNumber, formatPercent } from '../lib/format';
 import { useCookieHistory, useCookieState } from '../lib/history';
 import { COOKIE_KEYS, decodeDefenseInputs, defenseSnapshotCodec, encodeDefenseInputs } from '../lib/persistence';
 import { formatShareText } from '../lib/share';
 import { StatRow } from './Field';
 import { HistoryTable, type HistoryColumn } from './HistoryTable';
+import { ManualEntryForm } from './ManualEntryForm';
 import { RoWindow } from './RoWindow';
 import { SaveControls } from './SaveControls';
 import { ShareButton } from './ShareButton';
@@ -171,6 +172,7 @@ export function DefenseCalculator() {
           <TrendChart title={t.tracking.rawPdef} points={points} series={[{ key: 'rawPdef', name: t.tracking.rawPdef }]} />
           <TrendChart title={t.tracking.rawMdef} points={points} series={[{ key: 'rawMdef', name: t.tracking.rawMdef }]} />
         </div>
+        <ManualEntryForm onAdd={(reading, label, at) => history.add(inputsFromRawDefense(reading), label, at)} />
       </RoWindow>
 
       {history.entries.length > 0 && (

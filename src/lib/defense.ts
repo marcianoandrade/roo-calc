@@ -88,6 +88,48 @@ export function toNumber(value: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+/** Parses a typed DEF value; null when blank, not a number or negative. */
+export function parseDefenseValue(value: string): number | null {
+  const cleaned = normalizeDecimal(value);
+  if (cleaned === '') return null;
+  const n = Number(cleaned);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+/** A reading taken elsewhere: the raw values, plus the DEF % when they are known. */
+export interface RawDefenseReading {
+  rawPdef: number;
+  rawMdef: number;
+  /** Equipment DEF % exactly as typed ('23', '23%'); blank when unknown. */
+  equipPdefPercent?: string;
+  equipMdefPercent?: string;
+}
+
+/** Equipment DEF that produces `raw` under `equipmentPercent`: `rawDefense` inverted. */
+export function equipmentDefense(raw: number, equipmentPercent: number): number {
+  // toFixed drops the float noise of the product (2328.46 * 1.23 -> 2864.0058000000004).
+  return Number((raw * (1 + Math.max(equipmentPercent, 0))).toFixed(6));
+}
+
+/**
+ * Inputs for a past reading, where the raw numbers are what is known: the equipment
+ * DEF is derived from the raw value and the DEF % (blank % behaves as 0, so raw DEF
+ * = equipment DEF). Recording it this way keeps DEFENSE_FIELDS unchanged and the raw
+ * values exactly as typed.
+ */
+export function inputsFromRawDefense(reading: RawDefenseReading): DefenseInputs {
+  const equipPdefPercent = reading.equipPdefPercent?.trim() ?? '';
+  const equipMdefPercent = reading.equipMdefPercent?.trim() ?? '';
+  return {
+    pdef: String(equipmentDefense(reading.rawPdef, parsePercent(equipPdefPercent))),
+    mdef: String(equipmentDefense(reading.rawMdef, parsePercent(equipMdefPercent))),
+    equipPdefPercent,
+    equipMdefPercent,
+    pdmgReduction: '',
+    mdmgReduction: '',
+  };
+}
+
 /** Raw DEF = equipment DEF / (1 + equipment DEF%). */
 export function rawDefense(equipmentDefense: number, equipmentPercent: number): number {
   const divisor = 1 + Math.max(equipmentPercent, 0);

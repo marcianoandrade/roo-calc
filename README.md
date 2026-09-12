@@ -21,6 +21,10 @@ created with inspiration from the original
   "after +10 armor") to record the current values with a timestamp.
 - **Progress charts** of Raw PDEF and Raw MDEF across your snapshots, plus a table
   where you can reload or delete any snapshot.
+- **Past readings**: *Add a past reading* (under the charts) records a reading you
+  already had somewhere else — you type the Raw PDEF/MDEF, the date they were taken
+  and, if you know them, the equipment DEF %. The history stays in chronological
+  order, so backfilled points land in the right place on the charts.
 - **Tier ladder**: the total raw DEF (PDEF + MDEF) is graded from *holding sandal
   mode* up to *peak tank*, with an EXP-style bar showing how far the next tier is.
   Hover the tier name to see every range.
@@ -44,6 +48,11 @@ created with inspiration from the original
    do not affect the raw DEF.
 4. Read the results in the **Basic Info** window, press **Save snapshot** whenever
    your gear changes, and watch the charts grow.
+5. Have older numbers from another calculator or an old screenshot? Open **Add a
+   past reading** under the charts and type the Raw PDEF/MDEF plus the date. The
+   **PDEF % / MDEF %** are optional: fill them in and the equipment DEF is derived
+   from them (so *Load* restores a complete snapshot); leave them blank and only the
+   raw numbers are kept. Either way the raw values stay exactly as typed.
 
 ## Where the data lives
 
@@ -105,6 +114,7 @@ src/
     TierPanel.tsx          tier name, bar and the hover ladder
     TrendChart.tsx         line chart (Recharts)
     HistoryTable.tsx       snapshot table (load / delete / clear)
+    ManualEntryForm.tsx    past reading (date + raw values, optional DEF %)
     SaveControls.tsx       label input, Calculate, Save snapshot, Reset
     ShareButton.tsx        copies the share text to the clipboard
   App.tsx, main.tsx, styles.css
@@ -142,6 +152,12 @@ em **Raw PDEF / Raw MDEF**, lembra o que você digitou, salva *snapshots* com da
 rótulo, mostra gráficos da evolução e classifica a defesa total em patamares (de
 *holding sandal mode* a *peak tank*). O botão **Share** copia
 `Raw Pdef: {valor} Raw Mdef: {valor}` para colar no chat do jogo.
+
+Também dá para **adicionar leituras antigas**: em *Adicionar leitura antiga*
+(abaixo dos gráficos) você digita o Raw PDEF/MDEF, a data em que foram tirados e,
+se souber, os DEF % (opcionais) — útil para trazer números de outra calculadora ou
+de prints. O histórico é mantido em ordem cronológica, então o ponto entra no lugar
+certo do gráfico.
 
 Tudo fica nos **cookies do navegador** (prefixo `roo.`, validade de 1 ano, limite de
 80 snapshots). Não existe servidor nem conta. O site hospedado conta visitas com a

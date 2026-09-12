@@ -640,6 +640,76 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------------- Past reading (manual entry) ---------------- */
+
+.ro-manual-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ro-manual-toggle .ro-feedback {
+  margin: 0;
+  font-size: 10px;
+  color: #2c5c2c;
+}
+
+.ro-manual {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--ro-screen);
+  border: 1px solid var(--ro-border-soft);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.ro-manual .ro-section-title {
+  margin: 0 0 2px;
+}
+
+.ro-manual .ro-help {
+  margin: 0 0 6px;
+}
+
+.ro-manual-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px 10px;
+}
+
+.ro-manual-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ro-manual-field-wide {
+  grid-column: span 2;
+}
+
+.ro-manual-field span {
+  font-size: 10px;
+  color: var(--ro-muted);
+}
+
+.ro-manual-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ro-manual-actions .ro-feedback {
+  margin: 0;
+  font-size: 10px;
+  color: #2c5c2c;
+}
+
+.ro-manual-actions .ro-feedback-error {
+  color: #7a1c1c;
+}
+
 /* ---------------- Snapshot table ---------------- */
 
 .ro-table-head {
@@ -758,6 +828,14 @@ a {
 
   .ro-actions {
     grid-template-columns: 1fr;
+  }
+
+  .ro-manual-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ro-manual-actions {
+    flex-wrap: wrap;
   }
 
   /* Keep the PDEF/MDEF pairs side by side on phones; stack label over input. */
