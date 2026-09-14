@@ -7,3 +7,9 @@ dist-ssr
 .idea
 .DS_Store
 *.log
+
+# Segredos / config local da Vercel (nunca commitar)
+.env
+.env.*
+!.env.example
+.vercel
